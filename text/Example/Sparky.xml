@@ -1,0 +1,16 @@
+
+<Page name="Sparky" >
+	<t>Sparky</t>
+	<Content>
+		<p><x>Meet my pet Sparky:)</x> </p>
+		<p>
+				Software development depends on patterns.  Sparky exhibits a pattern that is frequently used in software design.  
+				Sparky was born in 2006, but the algorithms are ancient.
+		</p> <p>
+				If you choose to feed Sparky, please be advised, he grows very quickly.  If you feed him more than a couple of nibbles, your cpu may not be powerful enough to accommodate his computationally expensive ways.  This might drive sparky crazy.
+				If you starve him, he might die.  
+		</p> <p>
+				In the world of computer programming, there is no magic pixie dust.  However, a little understanding can go a long way.  Sparky demonstrates what might be one of the most powerful concept in software.
+		</p>
+	</Content>
+</Page>

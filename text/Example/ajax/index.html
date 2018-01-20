@@ -1,0 +1,67 @@
+
+		<link rel="stylesheet" href="webkruncher.css" type="text/css" />
+		<link rel="stylesheet" href="style.css" type="text/css" />
+		<title>Information Kruncher</title>
+		
+		<script type="text/javascript" src="ajax.js" ></script>
+
+		<script type="text/javascript" src="Breadcrumbs.js" ></script>
+		<script type="text/javascript" src="Bugger.js" ></script>
+		<script type="text/javascript" src="Tools.js" ></script>
+		<script type="text/javascript" src="Animator.js" ></script>
+		<script type="text/javascript" src="Motivator.js" ></script>
+		<script type="text/javascript" src="mousetrails.js" ></script>
+		<script type="text/javascript" src="MenuCore.js" ></script>
+		<script type="text/javascript" src="Menu.js" ></script>
+		<script type="text/javascript" src="Everything.js" ></script>
+		<script type="text/javascript" src="Texture.js" ></script>
+		<script type="text/javascript" src="Lemming.js" ></script>
+		<script type="text/javascript" src="Mood.js" ></script>
+		<script type="text/javascript" src="Collisions.js" ></script>
+		<script type="text/javascript" src="Particle.js" ></script>
+		<script type="text/javascript" src="Plotter.js" ></script>
+		
+		<script type="text/javascript" src="Menu.WebKruncher.js" ></script>
+<body>	
+	<head>
+
+	</head>
+		<div id="MenuRoot" />
+		<div id="SpareRoot" />
+	<div>
+		<div id="RootNode" />
+		<div id="LastDitch" 
+			style="position:absolute; top:300px; left:400px; color:red;"
+		/>
+	</div>
+	<div id="PreInitDiagnosticsDiv"  > <div ></div><table class="Entry" /> </div>
+	<div id="WelcomeDiv" >
+		<center>
+			<div id="DefaultWelcome" class="Entry" style="display:block;">
+				<p id="DefaultWelcomeMessage" >
+					JavaScript is required to enter this website
+				</p>
+			</div>
+		</center>
+	</div>
+</body>
+
+<script language="JavaScript" >
+function Loader()
+{
+	setInterval(1000,"MenuCheck()");
+	o=GetObject("DefaultWelcome")
+	o.style.display="none"
+	o=GetObject("WelcomeDiv")
+	o.style.display="none"
+	BackFlip()
+}
+function FlipLoader()
+{
+	setTimeout("Loader()",10)
+}
+window.onload=FlipLoader
+
+
+</script>
+

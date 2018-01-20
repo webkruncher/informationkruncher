@@ -1,0 +1,44 @@
+
+
+
+<Page name="ExecutableXML">
+	<t>ExecutableXML</t>
+	<Content>
+		<p>
+			Extensible Markup Language, or XML is a well known, 
+			internationally accepted way to deal with structured 
+			text.  The language is used primarily as a 
+			transport mechanism for moving properties and content 
+			between endpoints.
+		</p>
+		<p>
+			<text>WebKruncher's</text><whitespace />
+			<div 
+				style="cursor:pointer;display:inline; color:teal;"
+				onmouseover="this.style.color='blue'"
+				onmouseout="this.style.color='black'"
+				onclick="Navigate('Leave','http://github.com/webkruncher/exexml')" >ExeXml Project
+			</div>
+
+			<whitespace />
+			<text>is a pure ISO 14882 (C++ / STL) approach 
+			for digesting XML content. The library is fully contained in 
+			a single header file, and depends only on the 
+			Standard Template Library and a few trivial type 
+			abstraction definitions.
+			</text>
+		</p>
+		<p>
+			The project offers a unique, but incredibly flexible 
+			approach for digesting XML contents into heterogeneous 
+			C++ objects.
+		</p>
+		<p>
+			ExecutableXML is adaptable to international standard io 
+			streams, and provides a foundation for modeling complex 
+			C++ architectures. The xml can describe anything you want.
+		</p>
+	</Content>
+</Page>
+
+

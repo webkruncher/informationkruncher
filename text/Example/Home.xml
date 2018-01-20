@@ -1,0 +1,35 @@
+
+<Page name="Home">
+	<t>Home</t>
+	<Content>
+		<p> 
+			Thank you for visiting my hobby site.  
+		</p>
+		<p> 
+			<div style="display:inline">This site runs on my own, custom built</div>
+			<div 
+				style="cursor:pointer;display:inline; color:teal;"
+				onmouseover="this.style.color='blue'"
+				onmouseout="this.style.color='black'"
+				onclick="Navigate('KrunchServer.Details')" >
+				web server
+			</div>.  
+			<div style="display:inline">
+			All of the client side script is 
+			home made, and the only software used is the operating system, the standard 
+			tool-chain, and a few custom source files.</div>
+		</p>
+		<p> 
+			International standards power the internet.  The information super highway
+			is a product of thousands of engineers, and millions of users.  No
+			software maker deserves credit for inventing it, and nobody owns it.	
+		</p>
+		<p>
+			The web server that powers this web site is designed using pure C++.
+			The server is designed to be portable.  The same source code that runs
+			on my BSD and Linux systems could run on any other standards based system.
+			Most of the tools used will run on any operating system.
+		</p>
+	</Content>
+</Page>
+

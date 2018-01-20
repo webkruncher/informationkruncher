@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+
+
+
+<html>
+	<title>Information Kruncher</title>
+	<Pages> 
+		<Include name="Top" filename="Top.xml" />
+		<Include name="Left"  filename="Left.xml" />
+		<Include filename="Depot.xml" />
+		<Include filename="Utilities.xml" />
+		<Include filename="Demos.xml" />
+		<Include filename="Outside.xml" />
+		<Page name="Skills" />
+		<Page name="Services" />
+		<Page name="Home" />
+		<Page name="Minimalism" />
+		<Page name="About" />
+		<Page name="git" />
+		<Page name="Depot" />
+		<Page name="Sparky" />
+		<Page name="Diagnostics" />
+		<Page name="KrunchServer.Details" />
+		<Page name="KrunchServer.Example" />
+		<Page name="ExecutableXML" />
+		<Page name="Contactphone" />
+		<Page name="Contactlinkedin" />
+		<Page name="KrunchServer" />
+	</Pages>
+	<Diagnostics name="Diagnostics" />
+</html>
+

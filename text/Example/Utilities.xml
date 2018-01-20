@@ -1,0 +1,23 @@
+
+<Page name="Utilities">
+	<p>
+		<x>
+			This site is powered by the InformationKruncher's KrunchServer.  The server
+			is designed to meet the following criteria:
+		</x>
+		<li>Built purely using international standards</li>
+		<li>Is infinitely extensible</li>
+		<li>Is fault tolerant, and completely secure</li>
+		<li>May be driven by normalized schema</li>
+		<li>Works the same in every standard operating environment</li>
+		<li>Must be legible, and designed to accomadate the needs of any competent computer programmer.</li>
+	</p>
+		<p><x><hr /></x></p>
+
+	<p>
+		<x>Certain parameters found in many mainstream product lines, that are not a goal of the KrunchServer include, but are not limited to</x>
+		<li>Ability to work with systems that are designed to be incompatible with international standards</li>
+		<li>Methods to promote any sinkhole of support</li>
+		<li>Techniques to hobble the product, or cause it to be dysfunctional in support of forced upgrades or other sales efforts</li>
+	</p>
+</Page>

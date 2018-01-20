@@ -1,0 +1,18 @@
+
+<Page name="Contactphone" >
+	<t>Contact</t>
+	<Content>
+		<p>
+			<text>
+			Jack M. Thompson
+			</text>
+			<img style="display:inline;float:right;margin:8px;border:inset;" 
+				src="images/GoldenGate.jpg" 
+				width="128px" height="128px" 
+			/>
+			<whitespace />
+		</p>
+		<p>Phone: 818.209.7544</p>
+		<p>E-Mail: WebKruncher at GMail.com</p>
+	</Content>
+</Page>

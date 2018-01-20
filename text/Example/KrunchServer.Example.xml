@@ -1,0 +1,90 @@
+
+
+<Page name="KrunchServer.Example">
+	<t>InfoKruncher Example</t>
+	<Content>
+		<p>	
+			<div style="font-size:5pt;display:inline">
+
+			<pre>
+
+	struct CustomIndex : Response
+	{
+		CustomIndex
+		(
+			Request&amp; _request, 
+			const string _tbd, 
+			int&amp; _status
+		) : 
+			request( _request ), 
+			tbd( _tbd ), 
+			status( _status ) 
+			{}
+		virtual void operator ()()
+		{
+			Socket&amp; sock(request);
+			sock.flush();
+			stringstream ss;
+			SrcNode sourcenode(NULL);
+			sourcenode(&quot;root&quot;,&quot;symlnk/to/payload&quot;,1);
+			string srequest(request.c_str());
+			string file(tbd.c_str());
+			const string contenttype(&quot;text/xml&quot;);
+			status=200;
+
+			XmlPayload::Payload config
+				( sourcenode,XmlPayload::Payload::Run);
+
+			{
+				ifstream in(&quot;text/symlink/to/index.xml&quot;);
+				config.Load(in);
+			}
+
+			XmlFamily::XmlNode&amp; merged(config);
+			config.TabLevel(0);
+			merged();
+
+			ss &lt;&lt; &quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;&quot; &lt;&lt; endl;
+			ss &lt;&lt; &quot;&lt;?xml-stylesheet type=\&quot;text/xsl\&quot; href=\&quot;.indicies.xslt\&quot;?&gt;&quot; &lt;&lt; endl &lt;&lt; endl; 
+
+			ss &lt;&lt; merged;
+			ss &lt;&lt; &quot;&lt;root&gt;&quot;&lt;&lt;endl&lt;&lt;sourcenode&lt;&lt;endl&lt;&lt;&quot;&lt;/root&gt;&quot;&lt;&lt;endl;
+
+			stringstream response;
+			response &lt;&lt; &quot;HTTP/1.1 &quot; &lt;&lt; status &lt;&lt; &quot; &quot; &lt;&lt; statusText(status) &lt;&lt; endl;
+			response &lt;&lt; &quot;Content-Type: &quot; &lt;&lt; contenttype &lt;&lt; endl;
+			response &lt;&lt; &quot;Server: InformationKruncher&quot; &lt;&lt; endl;
+			response &lt;&lt; &quot;Connection: close&quot; &lt;&lt; endl;
+			response &lt;&lt; &quot;Content-Length:&quot; &lt;&lt; ss.str().size() &lt;&lt; endl;
+			response &lt;&lt; endl;
+			response &lt;&lt; ss.str();
+
+
+			cout &lt;&lt; green &lt;&lt; bluebk &lt;&lt; tab &lt;&lt; &quot;Loaded Src, writing&quot; &lt;&lt; endl &lt;&lt; normal &lt;&lt; flsh;
+			sock.write(response.str().c_str(), response.str().size());
+			sock.flush();
+			stringstream ssout; ssout &lt;&lt; fence &lt;&lt; &quot;[PAGE]&quot; &lt;&lt; fence &lt;&lt; file &lt;&lt; fence; Log(ssout.str());
+		}
+		protected:
+		Request&amp; request;
+		int&amp; status;
+		const string tbd;
+		private:
+		virtual ostream&amp; operator&lt;&lt;(ostream&amp; o) const 
+		{
+			o &lt;&lt; fence &lt;&lt; &quot;[page]&quot; &lt;&lt; fence 
+			&lt;&lt; request.Host() &lt;&lt; fence &lt;&lt; 
+			RequestUrl(request.c_str()) &lt;&lt; fence; 
+			return o; 
+		}
+	};
+
+
+
+			</pre>
+			</div>
+		</p>
+	</Content>
+</Page>
+
+

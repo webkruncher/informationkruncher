@@ -1,0 +1,38 @@
+
+<Left type="rootmenu" >
+	<item>
+		<name></name>
+		<item>
+			<name></name><text>Main</text>
+			<item><clicked>Navigate("Home")</clicked><name>Home</name><text>Home</text></item>
+			<item><clicked>Navigate("About")</clicked><name>About</name><text>About</text></item>
+		</item>
+		<item>
+			<name>Software</name><text>Software</text>
+			<xc>Navigate("Services")</xc>
+			<item>
+				<item>
+					<name>Projects</name><text>Projects</text>
+					<opensub>DepotMenu</opensub>
+				</item>
+				<item>
+					<name>Services</name><text>Services</text>
+					<opensub>Krunch</opensub>
+				</item>
+			</item>
+		</item>
+		<item>
+			<name>Contact</name><text>Contact</text>
+			<item>
+				<name>Call or Write</name><text>Call or Write</text>
+				<clicked>Navigate("Contactphone")</clicked>
+			</item>
+			<item>
+				<name>Linked In</name><text>Linked In</text>
+				<clicked>Navigate("Contactlinkedin")</clicked>
+			</item>
+		</item>
+	</item>
+</Left>
+
+

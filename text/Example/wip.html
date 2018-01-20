@@ -1,0 +1,810 @@
+
+<style>
+a:link /* unvisited link */
+{
+	color:black;
+	margin-right:8px;
+}      
+a:visited /* visited link */
+{
+	color:black;
+	margin-right:8px;
+}  
+a:hover /* mouse over link */
+{
+	color:black;
+	margin-right:8px;
+}  
+a:active /* selected link */
+{
+	color:black;
+	margin-right:8px;
+}  
+
+.tester
+{
+	background:red;
+}
+
+
+
+body
+{
+	margin: 0px;
+	padding-left: 00px;
+	padding-top: 0px;
+	margin: 0px;
+	font-family: courier;
+	font-size:12px;
+	font-weight:bold;
+	background:black;
+	color:silver;
+	background-repeat:repeat-y, repeat-x;
+}
+
+
+.Entry
+{
+	color:blue;
+}
+
+#SystemLock
+{
+	position:absolute; 
+	width:400px; 
+	height:10em; 
+	top:330px; 
+	left:300px; 
+	background:gray; 
+	color:red; 
+	display:none;
+}
+
+#PreInitDiagnosticsDiv
+{
+	position:absolute; 
+	width:400px; 
+	height:200px;
+	top:200px; 
+	left:400px; 
+	color:blue;
+}
+
+
+#DiagnosticsDiv
+{
+	position:absolute; 
+	width:500px; 
+	height:200px;
+	top:00px; 
+	left:00px; 
+	color:blue;
+	display:none;
+}
+
+#MenuMessagesDiv
+{
+	position:absolute; 
+	width:400px; 
+	height:200px;
+	top:00px; 
+	left:500px; 
+	color:blue;
+}
+
+.piecebugger
+{
+	color:red;
+	text-align:center;
+}
+
+.particle
+{
+	color:blue;
+	position:absolute;
+}
+
+
+.DynamicMenu
+{
+	border:thin solid teal;
+	color:blue;
+	position:absolute;
+}
+
+.DynamicMenuRoot
+{
+	color:blue;
+	position:absolute;
+	border:none;
+}
+
+
+.MenuRoot
+{
+	margin: 0px;
+	border:none;
+	vertical-align:top;
+	display:block;
+}
+
+.MenuTree
+{
+	margin: 0px;
+	margin-left: 18px;
+	border:none;
+	vertical-align:top;
+	display:block;
+}
+
+
+#LMenuTab
+{
+	margin: 0px;
+	padding: 0px;
+	border:none;
+}
+
+.LMenuLink
+{
+	border:none;
+	color:silver;
+	cursor:pointer;
+	font-style:normal;
+	display:block;
+}
+
+.LMenuLink:link
+{
+	border:none;
+	color:silver;
+	cursor:pointer;
+	font-style:italic;
+	display:block;
+}
+
+.LMenuLink:active
+{
+	border:none;
+	color:silver;
+	font-style:oblique;
+	cursor:pointer;
+	display:block;
+}
+
+.LMenuLink:visited
+{
+	border:none;
+	color:silver;
+	cursor:pointer;
+	display:block;
+}
+
+.LMenuLink:hover
+{
+	border:none;
+	color:teal;
+	font-style:italic;
+	cursor:pointer;
+	display:block;
+}
+
+
+.RootMenu
+{
+	padding:10px;
+	width:130px;
+	border:inset; 
+	background:#34282C;
+}
+
+.MenuFrame
+{
+	color:silver;
+	margin:0px;
+	vertical-align:top;
+	text-decoration:  none;
+	font-style:normal;
+	font-weight:100;
+	white-space:nowrap;
+	background-repeat: repeat;
+	border:none;
+	width:100px;
+}
+
+.PopUpMenuFrame
+{
+	width:24ex; 
+	padding:4px;  
+	border:thin outset gray;
+	background:#010101;
+	background-repeat:repeat-x repeat-y;
+}
+
+.PopUpMenuTitle
+{
+	color:silver;
+	background-repeat:repeat-x repeat-y;
+}
+
+.PopUpMenu
+{
+	border:thick inset silver;
+	padding:3px;
+	margin:3px;
+	width:22ex;
+	color:silver;
+	background:#010101;
+	background-repeat:repeat-x repeat-y;
+}
+
+.InnerMenuFrame
+{
+	margin: 0px;
+	vertical-align:top;
+	text-decoration:  none;
+	font-style:normal;
+	font-weight:900;
+	white-space:nowrap;
+	background-repeat: repeat;
+	width:10ex;
+	background:gray;
+	background-repeat:repeat-x repeat-y;
+}
+
+.SubMenu
+{
+	margin-left:4px;
+	margin-top:0px;
+	border:none;
+	cursor:pointer;
+	display:block;
+	font-size:12px;
+}
+
+.InnerSubMenu
+{
+	margin-left:4px;
+	margin-top:0px;
+	border:none;
+	cursor:pointer;
+	display:inline;
+	font-size:12px;
+}
+
+.SubMenuButton
+{
+	color:silver;
+	width:100%;
+}
+
+.SubMenuButton_Out
+{
+	color:red;
+}
+
+.InnerSubMenuButton
+{
+	color:#34282C;
+}
+
+.SubMenuButton_Over
+{
+	color:teal;
+}
+
+.SubMenuOpen
+{
+	margin-left:10px;
+	margin-top:10px;
+	color:silver;
+	display:block;
+}
+
+.SubMenuLink
+{
+	margin-left:20px;
+	border:none;
+	text-decoration:none;
+	color:navy;
+	font-style:italic;
+	font-weight:800;
+	cursor:pointer;
+}
+
+.SubMenuLink:active
+{
+	margin-left:20px;
+	border:none;
+	text-decoration:none;
+	color:red;
+	font-style:italic;
+	font-weight:800;
+
+}
+
+.SubMenuLink:visited
+{
+	margin-left:20px;
+	font: 10px arial;
+	border:none;
+	text-decoration:none;
+	color:black;
+	font-style:italic;
+	font-weight:800;
+	cursor:pointer;
+
+}
+
+.SubMenuLink:link
+{
+	margin-left:20px;
+	border:none;
+	text-decoration:none;
+	color:green;
+	font-style:italic;
+	font-weight:800;
+	cursor:pointer;
+}
+
+.SubMenuLink:hover
+{
+	margin-left:20px;
+	border:none;
+	text-decoration:none;
+	color:blue;
+	font-style:italic;
+	font-weight:800;
+	cursor:pointer;
+}
+
+TABLE
+{
+	border-collapse:collapse;
+}
+
+TR
+{
+}
+
+TD
+{
+	vertical-align:top;
+	margin: 0px;
+	padding: 0px;
+}		
+
+#Masthead
+{
+}
+	
+#WebKruncherLogo
+{
+	display:inline;
+	background-repeat: no-repeat;
+	position:absolute;
+	top:0px;
+	left:0px;
+	border:0px solid #003366;
+	white-space:nowrap;
+}
+
+#MastheadText
+{
+	position:absolute;
+	top:40px;
+	left:100px;
+	width:400px;
+	height:100px;
+	border:none;
+	white-space:nowrap;
+	display:none;
+}
+			
+.TextLink
+{
+}
+
+#OutsidePage
+{
+	margin:0;
+	padding:0;
+	border:thick outset silver;
+}
+
+.Page
+{
+	margin:20;
+	padding:12px;
+	vertical-align:middle;
+	color:black;
+	display:block;
+	position:absolute;
+	left:156px;
+	top:153px;
+	width:500px;
+	background-repeat:repeat-x repeat-y;
+	border:inset;
+}	
+
+.Paragraph
+{
+	color:beige;
+	width:500px;
+}
+
+.Navigator
+{
+	color:blue;
+}
+
+.IFrame
+{
+	width:100%;
+	height:500px;
+}
+
+.PageTitle
+{
+	font-size:+1em;
+	color:silver;
+	display:block;
+	position:absolute;
+	border:outset thin;
+	margin:10px;
+	padding:4px;
+	padding-left:40px;
+	top:-20;
+	left:-20px;
+	background:#010101;
+	width:180px;
+}
+
+.BckNavButton
+{
+	position:absolute;
+	left:00px;
+	width:20px;
+	cursor:pointer;
+	background:outset;
+	border:thin;
+	color:white;
+	display:none;
+	font-size:6pt;
+	background:#010101;
+}
+
+.FwdNavButton
+{
+	position:absolute;
+	width:30px;
+	left:180px;
+	cursor:pointer;
+	background:outset;
+	border:thin;
+	color:white;
+	display:none;
+	font-size:6pt;
+	background:#010101;
+}
+
+#PageText
+{
+	margin-left:0px;
+	margin-top:0px;
+}	
+
+.PageFooter
+{
+	font-size:0.5em;
+	color:green;
+	background:blue;
+}
+
+.PageFooterText
+{
+	text-align:right;
+}
+
+.PageFooterText:link
+{
+	text-align:right;
+	margin-top:10px;
+	padding-right: 200px;
+}
+
+#PageFooterW3Icons
+{
+	text-align:left;
+	padding-left: 0px;
+	padding-top:400px;
+	display:none;
+}
+
+.ServicesHr
+{
+}
+
+
+#ProjectCompanyName
+{
+}
+
+#ProjectTitle
+{
+}
+
+#FooterBar
+{
+	margin-left:130px;
+	background:#e2e8ea;
+	border:outset gray thick;
+}
+
+#pieces1
+{
+	position:absolute;
+	top:100px;
+	left:100px;
+	border:0px solid #003366;
+	display:inline;
+}
+
+#SteelBkg
+{
+	display:inline;
+	top:00px;
+	left:00px;
+	width: 1270px;
+	height:768px;
+	border:0px;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+
+#SteelBkg_test
+{
+	background-repeat: no-repeat;
+	position:absolute;
+	top:00px;
+	left:00px;
+	width: 1280px;
+	height:768px;
+	border:0px;
+	display:inline;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+
+.SteelBkgTop
+{
+	display:inline;
+	background-repeat: no-repeat;
+	position:absolute;
+	top:00px;
+	left:00px;
+	width: 1280px;
+	height:157px;
+	border:0px;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+
+.SteelBkgLeft
+{
+	display:inline;
+	position:absolute;
+	top:155px;
+	left:00px;
+	width: 246px;
+	height:597px;
+	border:0px;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+
+}
+
+.SteelBkgBottom
+{
+	display:inline;
+	background-repeat: no-repeat;
+	position:absolute;
+	top:750px;
+	left:00px;
+	width: 1280px;
+	height:14px;
+	border:0px;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+
+}
+
+
+.SteelBkgRight
+{
+	display:inline;
+	background-repeat: no-repeat;
+	position:absolute;
+	top:155px;
+	left:1136px;
+	width: 144px;
+	height:597px;
+	border:0px;
+	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+
+.plot
+{
+	position:absolute;
+	display:none;
+}
+
+.diagnostics_root 
+{
+	color:navy;
+}
+
+
+.diagnostics_text
+{
+	color:red;
+}
+
+.diagnostics
+{
+	font-weight:100;
+	font-size:14px;
+	display:block;
+}
+
+.hidden_diagnostics
+{
+	display:none;
+}
+
+.UserMessages
+{
+	position:absolute;
+	top:20px;
+	left:680px;
+	color:black;
+}
+
+.UserMessageText
+{
+	font-weight:900;
+	font-size:12px;
+	color:black;
+}
+
+.utr
+{
+	color:black;
+	border:none;
+}
+.utd
+{
+	color:black;
+	border:none;
+}
+
+.BreadCrumbTag
+{
+	cursor:pointer;
+	color:silver;
+	display:none;
+	position:absolute;
+	left:580px;
+	top:60px;
+}
+
+#CrumbDiv
+{
+	cursor:pointer;
+	font-weight:bold;
+	line-height:10px;
+	color:navy;
+	display:inline;
+	height:500px;
+	overflow:hidden;
+	position:absolute;
+	left:880px;
+	top:60px;
+	width:100px;
+}
+
+p
+{
+	font-size:12px;
+}
+
+li
+{
+	color:silver;
+}
+
+table
+{
+}
+
+tr
+{
+}
+
+th
+{
+	color:silver;
+	text-align:left;
+	padding-left:8px;
+	padding-right:8px;
+}
+
+
+
+td
+{
+	color:navy;
+	text-align:left;
+	padding-left:8px;
+	padding-right:8px;
+}
+
+.tdmsg
+{
+	color:white;
+	cell-padding:0;
+	cell-spacing:0;
+	border:none;
+	padding-left:0;
+	margin-left:0;
+	padding-right:0;
+	margin-right:0;
+}
+
+.dmsg
+{
+	color:white;
+	padding-left:0;
+	margin-left:0;
+	padding-right:0;
+	margin-right:0;
+}
+
+</style>
+
+
+<script type="text/javascript" src="tools.js" ></script>
+
+<html>
+	<body>
+		<div style="display:inline; position:absolute; top:100px; left:100px; font-size:22pt;">
+			<table><tr><td id="underconstruction"></td></tr></table>
+		</div>
+		<div style="display:inline; position:absolute; top:200px; left:100px; font-size:22pt;">
+			<table><tr><td id="wip"></td></tr></table>
+		</div>
+	</body>
+</html>
+
+
+
+<script type="text/javascript" >
+	txt1="This site is under construction." 
+	txt2="But wait 'till you see what I have in store!" 
+	saysomething( 0, "underconstruction", txt1 , 0)
+	saysomething( txt1.length*100, "wip", txt2 , 0)
+</script>
+

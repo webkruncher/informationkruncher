@@ -1,0 +1,54 @@
+
+
+<Page name="git" >
+	<t>Open Source Projects</t>
+	<Content>
+		<div style="display:block;width:100%;height:200px;">
+		<p>
+			
+		</p>
+		<p>
+		</p>
+		<p>
+			<div style="display:inline;width:10%;float:left;" >
+				<img style="display:inline;margin:8px;border:inset;" 
+					src="images/Keyboard.jpg" 
+					width="128px" height="128px" 
+				/>
+			</div>
+			<div style="border:silver outset; font-size:7pt; display:inline;width:60%;float:right;padding-top:10px;padding-bottom:10px;">
+				<div style="font-size:7pt; text-align:center; vertical-align:center; height:30px;">
+					WebKrunchers Open Source Projects
+				</div >
+			<div >
+				<div 
+					style="padding-left:20px;cursor:pointer;display:inline; color:teal;"
+					onmouseover="this.style.color='blue'"
+					onmouseout="this.style.color='black'"
+					onclick="Navigate('Leave','http://github.com/webkruncher/exexml')" >ExeXml Project
+				</div>
+				<br />
+				<div 
+					style="padding-left:20px;cursor:pointer;display:inline; color:teal;"
+					onmouseover="this.style.color='blue'"
+					onmouseout="this.style.color='black'"
+					onclick="Navigate('Leave','http://github.com/webkruncher/x11grid')" >X11Grid
+				</div>
+				<br />
+				<div 
+					style="padding-left:20px;cursor:pointer;display:inline; color:teal;"
+					onmouseover="this.style.color='blue'"
+					onmouseout="this.style.color='black'"
+					onclick="Navigate('Leave','http://github.com/webkruncher/xlife')" >XLife
+				</div>
+			</div>
+			</div>
+		</p>
+		</div>
+		<div style="display:block;width:100%;">
+		<p>
+		</p>
+		</div>
+	</Content>
+</Page>
+

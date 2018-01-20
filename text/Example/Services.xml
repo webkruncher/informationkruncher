@@ -1,0 +1,29 @@
+
+
+<Page name="Services">
+	<t>Services</t>
+	<Content>
+<p>
+I specialize in C++ / STL (ISO/IEC 14882). I've used many different technologies, and demonstrate the ability to produce and deploy integrate-able, generic technologies. I use advance C++ techniques, when appropriate, and carefully document my work. I make my systems as simple as possible, and create interface classes to make implementation easy and robust. I generally hide details as much as possible from the user.
+</p>
+<p>
+<text>
+I work exclusively with international standards based operating systems. My editor of choice is vim. My desktop is normally black and white command prompt only, no syntax highlighting whatsoever. 
+In my honest opinion, the best Integrated Development Environment (IDE), and the best debugger, is the one between your ears.
+</text>
+
+			<img style="display:inline;float:right;margin:8px;border:inset;" 
+				src="images/VimScreen.jpg" 
+				width="128px" height="128px" 
+			/>
+			<whitespace />
+<text>
+I have used several high level design tools and programming IDE systems, but choose to take advantage of the core utilities. I avoid using the mouse as much as possible, my fingers don't usually leave the keyboard when I work.
+</text>
+</p>
+<p>
+I produce source code that any competent standards programmer can easily digest. All work is designed with maintenance and extensions in mind. I make no effort whatsoever to obfuscate work or hide pertinent information from other developers. Interfaces are designed to hide implementation details from users, but are easily accessible. All of my work is designed to be re-used by any programmer, at any time, with or without my support. 
+</p>
+
+	</Content>
+</Page>

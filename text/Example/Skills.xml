@@ -1,0 +1,18 @@
+
+<Page name="Skills">
+	<t>Skills</t>
+	<Content>
+		<p>
+			<p>Areas of expertise:</p>
+			<li>Custom business-ware</li>
+			<li>Process Automation</li>
+		</p>
+		<p />
+		<p>
+			<p>Technologies Used:</p>
+			<li>C &amp; C++ / STL</li>
+			<li>Unix</li>
+		</p>
+	</Content>
+</Page>
+

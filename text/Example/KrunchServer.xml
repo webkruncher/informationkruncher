@@ -1,0 +1,51 @@
+
+<Page name="KrunchServer">
+	<t>Krunch Server</t>
+	<Content>
+	<p>
+		This site is powered by the InformationKruncher's KrunchServer.  The server
+		is designed to meet the following criteria:
+		<li>Built purely using international standards</li>
+		<li>Is infinitely extensible</li>
+		<li>Is fault tolerant, and completely secure</li>
+		<li>May be driven by normalized schema</li>
+		<li>Works the same in every standard operating environment</li>
+		<li>Must be legible, and designed to accomadate the needs of any competent computer programmer.</li>
+	</p>
+		<p><hr /></p>
+
+	<p>
+		Certain features found in many mainstream product lines, that are not a goal of the KrunchServer include, but are not limited to:
+		<li>Ability to work with systems that are designed to be incompatible with international standards</li>
+		<li>Methods to promote any sinkhole of support</li>
+		<li>Techniques to hobble the product, or cause it to be dysfunctional in support of forced upgrades or other sales efforts</li>
+	</p>
+
+	<p>
+		Here are links to the Source Forge projects:
+		<br />
+		You can find the code under the main menu, click on
+		code-svn-browse
+		<br />
+		<a href="http://webkruncher.svn.sf.net/" >
+			Server core
+		</a> <br />
+		<a href="http://webkrunchers.svn.sf.net/" >
+			Sample customized server
+		</a> <br />
+		<a href="http://spinlock.svn.sf.net/" >
+			Thread synchronization technique
+		</a> <br />
+		<a href="http://exexml.svn.sf.net/" >
+			Custom xml handler
+		</a> <br />
+		<a href="http://datapipe.svn.sf.net/" >
+			IO stream socket binding
+		</a> <br />
+		<a href="http://heterogeneity.svn.sf.net/" >
+			Extensible interface technique
+		</a> <br />
+	</p>
+	</Content>
+</Page>
+

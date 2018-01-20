@@ -1,0 +1,18 @@
+
+
+<Krunch type="submenu" >
+	<item>
+		<item>
+			<name>Overview</name><text>Overview</text>
+			<clicked>Navigate("Services")</clicked>
+		</item>
+		<item>
+			<name>Skills</name><text>Skills</text>
+			<clicked>Navigate("Skills")</clicked>
+			<testitem>
+				<name>sourcebutton</name><text>Sources</text>
+				<clicked>Navigate("Blank","sources/sources.html","Sources","menubar=no,location=no,resizable=yes,scrollbars=yes,status=no")</clicked>
+			</testitem>
+		</item>
+	</item>
+</Krunch>

@@ -1,0 +1,27 @@
+
+
+		<script type="text/javascript" src="Tools.js" ></script>
+
+Welcome to WebKruncher...<br />
+JavaScript is required to view this site.<br />
+Please note, this site requires use of a standard web browser<br />
+
+<div style="display:hidden;">
+	<form id="entrance" action="." method="post" />
+</div>
+<script language="JavaScript">
+	window.onload=function()
+	{
+		GetViewport() 
+		frm=GetObject("entrance")
+		s="/index.html?";
+		s+=viewportwidth;
+		s+="x";
+		s+=viewportheight;
+		//frm.action=s
+		//frm.submit()
+		//window.location=s
+		document.write("helo")
+	}
+</script>
+

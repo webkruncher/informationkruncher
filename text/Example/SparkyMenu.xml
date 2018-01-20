@@ -1,0 +1,18 @@
+
+
+
+<SparkyMenu type="submenu" >
+	<item>
+		<name>Sparky</name><text></text>
+		<item>
+			<name>About</name><text>About</text>
+			<clicked>Navigate("Sparky")</clicked>
+		</item>
+		<item>
+			<name>Control Sparky</name><text>Controls</text>
+			<item><name>on / off</name><clicked>ToggleSparky()</clicked><text>on/off</text> </item>
+			<item><name>Feed Sparky</name><clicked>FeedSparky()</clicked><text>Feed</text> </item>
+			<item><name>Starve Sparky</name><clicked>StarveSparky()</clicked><text>Starve</text> </item>
+		</item>
+	</item>
+</SparkyMenu>

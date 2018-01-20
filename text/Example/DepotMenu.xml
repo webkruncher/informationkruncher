@@ -1,0 +1,39 @@
+
+
+<DepotMenu type="submenu" >
+	<item>
+		<name>Projects</name><text></text>
+		<item>
+			<item>
+				<name>GitHub</name><text>GitHub</text>
+				<clicked>Navigate("git")</clicked>
+			</item>
+		</item>
+		<item>
+			<!--
+			<name>WebKruncher</name><text>WebKruncher</text>
+			<item type="submenu">
+				<name>ExeXml</name><text>Executable XML</text>
+				<clicked>Navigate("ExecutableXML")</clicked>
+			</item>
+			<item>
+				<name>KrunchServer</name><text>KrunchServer</text>
+				<clicked>Navigate("KrunchServer")</clicked>
+				<item>
+					<name>Details</name><text>Details</text>
+					<clicked>Navigate("KrunchServer.Details")</clicked>
+				</item>
+			</item>
+			-->
+			<item type="submenu">
+				<name>Demos</name><text>Demos</text>
+				<item>
+					<name>Sparky</name><text>Sparky</text>
+					<opensub>SparkyMenu</opensub>
+				</item>
+			</item>
+		</item>
+	</item>
+</DepotMenu>
+
+

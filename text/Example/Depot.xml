@@ -1,0 +1,23 @@
+
+
+<Page name="Depot">
+	<t>Depot</t>
+	<Content>
+		<p>
+			I'm building a set of utilities for use with 
+			orthodox computer systems.  The project is based strictly on 
+			ISO 14882, and is designed to be infinitely extensible.
+		</p>
+		<p>
+			All components of the project are built to be platform 
+			independant, and should operate the same regardless of the 
+			operating system.
+		</p>
+		<p>
+			Currently, the programs consist of two major sections.
+		</p>
+			<li>ExecutableXML</li>
+			<li>KrunchServer</li>
+		<p />
+	</Content>
+</Page>

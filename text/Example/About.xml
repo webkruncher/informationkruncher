@@ -1,0 +1,70 @@
+
+
+<Page name="About" >
+	<t>About</t>
+	<Content>
+		<p>
+			<text>
+				I've been writing software since 1993, almost 
+				entirely using international standards.
+				Just about every thing I do is built using
+				C++ / STL (ISO 14882) and geared toward complete 
+				platform independence.  
+			</text>
+
+			<img style="display:inline;float:right;margin:8px;border:inset;" 
+				src="images/myself.jpg" 
+				width="128px" height="128px" 
+			/>
+			<whitespace />
+			<text>
+				I try to make sure that everything I write	
+				may be easily ported to any mainstream operating 
+				system.  
+			</text>
+		</p>
+		<p>
+				I've worked on a wide variety of projects, and 
+				have seen a lot of different styles.  Many projects
+				depend on systems that are built using proprietary
+				libraries, and some depend on operating systems
+				that are designed to not follow standards.  But,
+				even in the worst case scenario, standards based
+				code is easy to port.  Building solid solutions
+				is a matter of using solid design principles.
+		</p>
+			<whitespace />
+			<text>
+			</text>
+			<img style="float:left;display:inline;margin:8px;border:inset;" 
+				src="images/Keyboard.jpg" 
+				width="128px" height="128px" 
+			/>
+		<p>
+			<whitespace />
+			<text>
+				Most of the time, solutions to complex problems 
+				can be solved with generic methods.  A web server
+				is a good example.  Servers are complicated, and
+				must answer some difficult problems, but
+				a server that can only suit the needs of one
+				program is virtually worthless.
+			</text>
+			<text>
+				Software is a team effort.  A software engineer
+				may be highly skilled, and understand software
+				design completely, but get nowhere without the
+				support of many other talents.
+			</text>
+		</p>
+		<p>
+			<whitespace />
+			<text>
+				In my opinion, the best approach is to have a 
+				good attitude, and find productive environments.
+				Teams that work well together get things done.
+			</text>
+		</p>
+	</Content>
+</Page>
+

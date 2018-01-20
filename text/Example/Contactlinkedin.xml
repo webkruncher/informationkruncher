@@ -1,0 +1,14 @@
+
+<Page name="Contactlinkedin" >
+	<t>Linked In</t>
+	<Html>
+		Visit my Linked In page at
+		<div 
+			style="cursor:pointer;display:inline; color:teal;"
+			onmouseover="this.style.color='blue'"
+			onmouseout="this.style.color='black'"
+			onclick="Navigate('Leave','http://www.LinkedIn.com/in/WebKruncher')" >
+				http://www.LinkedIn.com/in/WebKruncher
+			</div>
+	</Html>
+</Page>
