@@ -377,9 +377,9 @@ return 1;
         tv.tv_sec = s;
         tv.tv_usec = u;
         if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set send timeout") << endl;}
+            {ret=0; cerr<< ("Can't set send timeout") << endl;}
         if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set recieve timeout") << endl;}
+            {ret=0; cerr<< ("Can't set recieve timeout") << endl;}
         return ret;
     }
 
@@ -433,7 +433,6 @@ return 1;
 
 		SSL_CTX_set_default_passwd_cb_userdata(ctx,( char* ) KEY_PASSWD);
 
-
 		if (SSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM) <= 0 ) {
 			ERR_print_errors_fp(stderr);
 			exit(EXIT_FAILURE);
@@ -446,7 +445,7 @@ return 1;
 		}
 
 
-		//  SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,NULL);
+		//SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,NULL);
 
 
 		if (SSL_CTX_load_verify_locations(ctx,CA_FILE,CA_DIR)<1) {

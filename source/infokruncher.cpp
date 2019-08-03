@@ -26,12 +26,12 @@
 */
 
 
-#define HOME "/home/example"
+#define HOME "/home/jmt/csr/"
 
-#define CERT_FILE  HOME "example.crt"
-#define KEY_FILE  HOME  "example.key"
+#define CERT_FILE  HOME "server.crt"
+#define KEY_FILE  HOME  "server.key"
 
-#define CA_FILE "example.pem"
+#define CA_FILE "/home/jmt/csr/RapidSSL.pem"
 #define CA_DIR  NULL
 
 #define KEY_PASSWD ""
@@ -112,6 +112,9 @@ string Tbd(const icstring& request, const Request& req)
 	const icstring host(req.Host().c_str());
 	{stringstream ssout; ssout << fence << "[TBD]" << fence << host << fence << request.c_str() << fence ; Log(ssout.str());}
 
+	const string target(Target("WebKruncher.text", RequestUrl(request.c_str())));
+	return target;
+
 	if 
 	(
 		(host.find("example.ninja")!=string::npos) 
@@ -190,6 +193,7 @@ struct Response_Home : Response
 		string file(tbd.c_str());
 		const string contenttype(ContentType(srequest));
 
+
 		LoadFile(file.c_str(), ss);
 		status=200;
 
@@ -204,7 +208,7 @@ struct Response_Home : Response
 		response << ss.str();
 		sock.write(response.str().c_str(), response.str().size());
 		sock.flush();
-		stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence; Log(ssout.str());
+		stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
 	}
 	protected:
 	const string tbd;
@@ -603,7 +607,7 @@ void* service(void* lk)
 
 int main(const int argc, const char** argv)
 {
-	cout << "Starting infokruncher." << SERVICE_PORT << endl;
+	cerr << "Starting infokruncher." << SERVICE_PORT << endl;
 	SetSignals();
 	CmdLine cmdline(argc, argv);
 	if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
