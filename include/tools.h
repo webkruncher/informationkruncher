@@ -40,7 +40,7 @@ extern volatile bool KILL;
 namespace JTools
 {
 	using namespace OFormat;
-	void Log(const string& what) { if (1) syslog(1,what.c_str()); }
+	void Log(const string& what) { if (0) syslog(1,what.c_str()); }
 
 
 	struct stringvector : vector<string> 
@@ -286,7 +286,7 @@ namespace JTools
 		if (what.find(".xml ")!=string::npos) 
 			return "text/xml";
 
-		return "text/html";
+		return "text/html; charset=iso-8859-1;";
 	}
 
 	string Abrieviate(const string instr)

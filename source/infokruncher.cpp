@@ -158,7 +158,7 @@ struct Response_NotFound : Response
 		status=404;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -193,12 +193,11 @@ struct Response_Home : Response
 		string file(tbd.c_str());
 		const string contenttype(ContentType(srequest));
 
-
 		LoadFile(file.c_str(), ss);
 		status=200;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -235,7 +234,7 @@ struct Response_Ping : Response
 		status=200;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -282,7 +281,7 @@ struct Response_Binary : Response
 		const size_t fsize(FileSize(tbd));
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -377,7 +376,7 @@ struct Response_Page : Response
 
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -470,10 +469,10 @@ void* service(void* lk)
 {
 
         IpRegistry PermissionedIps;
-        PermissionedIps["127.0.0.1"] = 0;
-        PermissionedIps["149.134.173.200"] = 0;
-        PermissionedIps["69.243.17.71"] = 0;
-        PermissionedIps["98.233.128.99"] = 0;
+        //PermissionedIps["127.0.0.1"] = 0;
+        //PermissionedIps["149.134.173.200"] = 0;
+        //PermissionedIps["69.243.17.71"] = 0;
+        //PermissionedIps["98.233.128.99"] = 0;
 
 
 	{const int T((rand()%80)+300); usleep(T);}
@@ -599,7 +598,7 @@ void* service(void* lk)
 	if (!ssexcept.str().empty()) { cerr << red << "dumbservice: " << Abrieviate(ssexcept.str()) << normal << endl; cerr.flush(); }
 	if (!ssexcept.str().empty()) //Log(ssexcept.str());
 	{
-		cout << red << ssexcept.str()<<endl;
+		cerr << red << ssexcept.str()<<endl;
 		stringstream ssout; ssout << fence << "[EXCEPT]" << fence << ssexcept.str(); Log(ssout.str());
 	}
 	return NULL;
