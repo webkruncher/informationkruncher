@@ -29,7 +29,7 @@
 #define HOME "/home/jmt/csr/"
 
 #define CERT_FILE  HOME "server.crt"
-#define KEY_FILE  HOME  "server.key"
+#define KEY_FILE  HOME  "privatekey.pem"
 
 #define CA_FILE "/home/jmt/csr/RapidSSL.pem"
 #define CA_DIR  NULL
@@ -111,6 +111,9 @@ string Tbd(const icstring& request, const Request& req)
 {
 	const icstring host(req.Host().c_str());
 	{stringstream ssout; ssout << fence << "[TBD]" << fence << host << fence << request.c_str() << fence ; Log(ssout.str());}
+
+
+
 
 	const string target(Target("WebKruncher.text", RequestUrl(request.c_str())));
 	return target;
@@ -217,6 +220,71 @@ struct Response_Home : Response
 	virtual ostream& operator<<(ostream& o) const { o << fence << "[home]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 };
 
+struct Response_Left : Response
+{
+	void ReplaceAllWith( string& txt, const string what, const string how )
+	{
+		while ( true )
+		{
+			const size_t found( txt.find( what ) );
+			if ( found == string::npos ) return;
+			txt.erase( found, what.size() );
+			txt.insert( found, how );
+		}
+	}
+
+
+	void UnCommentItems( string& txt )
+	{
+		stringstream ssout; ssout << fence << "[LEFT-FULL]" << fence ; Log(ssout.str()); 
+		ReplaceAllWith( txt, "<!--item>", "<item>");
+		ReplaceAllWith( txt, "</item-->", "</item>");
+	} 
+
+	Response_Left(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
+	virtual void operator ()()
+	{
+		Socket& sock(request);
+		sock.flush();
+
+		string srequest(request.c_str());
+
+		string file(tbd.c_str());
+
+
+		const string contenttype(ContentType(srequest));
+
+		stringstream ss;
+		{
+			stringstream ssf;
+			LoadFile(file.c_str(), ssf);
+			string txt( ssf.str() );
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+				UnCommentItems( txt );
+			ss<<txt;
+		}
+		status=200;
+
+		stringstream response;
+		response << ( ( USE_SSL == 1 ) ? "HTTP" : "HTTP" ) << "/1.1 ";
+		response << status << " " << statusText(status) << endl;
+		response << "Content-Type: " << contenttype << endl;
+		response << "Server: WebKruncher" << endl;
+		response << "Connection: close" << endl;
+		response << "Content-Length:" << ss.str().size() << endl;
+		response << endl;
+		response << ss.str();
+		sock.write(response.str().c_str(), response.str().size());
+		sock.flush();
+		stringstream ssout; ssout << fence << "[LEFT]" << fence << file << fence << contenttype << fence; Log(ssout.str());
+	}
+	protected:
+	const string tbd;
+	Request& request;
+	int& status;
+	private:
+	virtual ostream& operator<<(ostream& o) const { o << fence << "[home]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
+};
 struct Response_Ping : Response
 {
 	Response_Ping(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
@@ -402,11 +470,25 @@ struct RequestManager : Request
 	operator Response* ()
 	{
 		Response* ret(NULL);
+#if 0
+		if ( ( sock.auth & KRUNCH_PERMIT_IP ) )
+		{
+			stringstream ssout; ssout << fence << "[KRUNCH_PERMIT_IP=TRUE]Nomic" << fence << fence; Log (ssout.str()); 
+			return new Response_Home(*this, "NomicOnline", status);
+		} else  {
+			stringstream ssout; ssout << fence << "[KRUNCH_PERMIT_IP=FALSE]Kruncher" << fence << fence; Log (ssout.str()); 
+			return new Response_Home(*this, "WebKruncher.text", status);
+		}
+#endif
+
+		stringstream ssout; ssout << fence << "[Krunching]" << fence <<fence; Log (ssout.str()); 
 		const string tbd(Tbd(request, *this));
+		//const string tbd("WebKruncher.text");
 		ret=ifBinary(tbd);
 		if (ret) return ret;
 		//if (request.find("GET /src ")==0) return new Response_SrcSys(*this, tbd, status);
 		if (request.find("/?ping ")!=string::npos) return new Response_Ping(*this, tbd, status);
+		if (request.find("GET /Left.xml ")==0) return new Response_Left(*this, tbd, status);
 		if (request.find("GET / ")==0) return new Response_Home(*this, tbd, status);
 		if (tbd.empty()) return new Response_NotFound(*this, status);
 		else return new Response_Page(*this, tbd, status);
@@ -469,7 +551,9 @@ void* service(void* lk)
 {
 
         IpRegistry PermissionedIps;
-        //PermissionedIps["127.0.0.1"] = 0;
+        PermissionedIps["127.0.0.1"] = 0;
+
+        PermissionedIps["69.244.76.22"] = 0;
         //PermissionedIps["149.134.173.200"] = 0;
         //PermissionedIps["69.243.17.71"] = 0;
         //PermissionedIps["98.233.128.99"] = 0;
