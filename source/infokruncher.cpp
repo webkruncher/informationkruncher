@@ -60,6 +60,7 @@ using namespace Hyper;
 volatile bool KILL(false);
 
 
+int Contract( int argc, char** argv ); // ContractKruncher tests
 
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
@@ -691,6 +692,7 @@ void* service(void* lk)
 int main(const int argc, const char** argv)
 {
 	cerr << "Starting infokruncher." << SERVICE_PORT << endl;
+	Contract( argc, argv );
 	SetSignals();
 	CmdLine cmdline(argc, argv);
 	if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
