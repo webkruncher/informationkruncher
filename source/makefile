@@ -6,6 +6,7 @@ INCS+=../include/infosock.h
 INCS+=../include/tools.h
 INCS+=../include/oformat.h
 INCS+=../include/spinlock.h
+INCS+=Ipv4Caller.h
 
 INCLUDES+=-I projects -I ../../contractkruncher -I ../../libdb/build_unix
 LIBS= -L../../libdb/build_unix -L../../libdb/build_unix/.libs/ -ldb_cxx -lpthread

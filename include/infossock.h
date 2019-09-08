@@ -317,6 +317,7 @@ namespace InformationSocket
 		while (true)
 		{
 //cerr << "G";
+			if ( line.size() > 512 ) return;
 			int c(get());
 			if (skips.find(c)!=skips.end())
 				{ skips.erase(c); continue; }

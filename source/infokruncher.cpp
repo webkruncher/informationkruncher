@@ -25,7 +25,6 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #define HOME "/home/jmt/csr/"
 
 #define CERT_FILE  HOME "server.crt"
@@ -60,8 +59,17 @@ using namespace Hyper;
 volatile bool KILL(false);
 
 
-int Contract( int argc, char** argv ); // ContractKruncher tests
 
+#include <db_cxx.h>
+using namespace std;
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include "Contract.h" 
+#include "DbNode.h" 
+#include "DbCursor.h" 
+#include <sys/stat.h>
+#include "DirTools.h"
+
+#include "Ipv4Caller.h"
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
 {
@@ -551,6 +559,9 @@ struct IpRegistry : map<string, unsigned long>
 void* service(void* lk)
 {
 
+	ContractKruncher::ContractData& database( ContractKruncher::ContractData::instance() );
+	Ipv4Caller::IpData& ipdb( Ipv4Caller::IpData::instance() );
+
         IpRegistry PermissionedIps;
         PermissionedIps["127.0.0.1"] = 0;
 
@@ -587,6 +598,8 @@ void* service(void* lk)
 
 			const bool UsingSsl( USE_SSL==1 );
 			//cerr << "Serving: " << ( UsingSsl ? "SSL" : "PLAINTEXT" ) << endl; cerr.flush();
+			//{ pair< string,string > kv( "tester", "test" ); ipdb+=kv; }
+
 
 			SSL_CTX* ctx( create_context( UsingSsl ) );
 
@@ -629,6 +642,7 @@ void* service(void* lk)
 				if (line.empty()) break;
 				if (requestline.empty()) requestline=line;
 				else headers.push_back(line.c_str());
+				if ( headers.size() > 10 ) continue;
 			}
 
 
@@ -651,6 +665,16 @@ void* service(void* lk)
                         } else {
                                 stringstream ssout; ssout << fence << "[OTHERIP]" << fence << addr << fence; Log (ssout.str()); 
                         }
+
+
+			{ 
+				string cookie="NONE";
+				if ( cookie.empty() ) cookie="NONE";
+				Ipv4Caller::Who whosthere( cookie );
+				pair< string, Ipv4Caller::Who > kv( addr, whosthere ); 
+				ipdb+=( kv ); 
+			}
+			
 
 
 			{
@@ -692,7 +716,7 @@ void* service(void* lk)
 int main(const int argc, const char** argv)
 {
 	cerr << "Starting infokruncher." << SERVICE_PORT << endl;
-	Contract( argc, argv );
+
 	SetSignals();
 	CmdLine cmdline(argc, argv);
 	if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
@@ -703,6 +727,14 @@ int main(const int argc, const char** argv)
 	stringstream ssexcept;
 	try
 	{
+
+		//JDirTools::FileScanner scanner( "./", "", "" );
+		//!!scanner;
+
+		ContractKruncher::ContractData& database( ContractKruncher::ContractData::instance() );
+		if ( ! database ) throw string("Cannot start ContractKruncher database");
+		Ipv4Caller::IpData& ipdb( Ipv4Caller::IpData::instance() );
+		if ( ! ipdb ) throw string("Cannot start ipdb database");
 		init_openssl();
 		SockQ Q;
 		Locker& lock(Q.lock);
@@ -731,6 +763,8 @@ int main(const int argc, const char** argv)
 			{const int T((rand()%10)+20); usleep(T); }
 		}
 
+		if ( ! database.destroy() ) throw string("Cannot stop ContractKruncher database");
+		if ( ! ipdb.destroy() ) throw string("Cannot stop ipdb database");
 		Log("joining");
 
 		for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
@@ -747,6 +781,21 @@ int main(const int argc, const char** argv)
 	catch (exception& e) {ssexcept<<e.what();}
 	catch (...) {ssexcept<<"unknown exception";}
 	if (!ssexcept.str().empty()) cerr << red << Abrieviate(ssexcept.str()) << normal << endl;
+
+	try
+	{ 
+		ContractKruncher::ContractData& database( ContractKruncher::ContractData::instance() );
+		if ( ! database.destroy() ) throw string("Cannot stop ContractKruncher database");
+		Ipv4Caller::IpData& ipdb( Ipv4Caller::IpData::instance() );
+		if ( ! ipdb.destroy() ) throw string("Cannot stop ipdb database");
+	}
+	catch (const char* e) {ssexcept<<e;}
+	catch (char* e) {ssexcept<<e;}
+	catch (string& e) {ssexcept<<e;}
+	catch (exception& e) {ssexcept<<e.what();}
+	catch (...) {ssexcept<<"unknown exception";}
+
+
 	return 0;
 }
 
