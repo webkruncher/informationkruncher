@@ -597,8 +597,6 @@ void* service(void* lk)
 
 
 			const bool UsingSsl( USE_SSL==1 );
-			//cerr << "Serving: " << ( UsingSsl ? "SSL" : "PLAINTEXT" ) << endl; cerr.flush();
-			//{ pair< string,string > kv( "tester", "test" ); ipdb+=kv; }
 
 
 			SSL_CTX* ctx( create_context( UsingSsl ) );
@@ -781,6 +779,11 @@ int main(const int argc, const char** argv)
 	catch (exception& e) {ssexcept<<e.what();}
 	catch (...) {ssexcept<<"unknown exception";}
 	if (!ssexcept.str().empty()) cerr << red << Abrieviate(ssexcept.str()) << normal << endl;
+	if (!ssexcept.str().empty()) //Log(ssexcept.str());
+	{
+		cerr << red << ssexcept.str()<<endl;
+		stringstream ssout; ssout << fence << "[EXCEPT]" << fence << ssexcept.str(); Log(ssout.str());
+	}
 
 	try
 	{ 
@@ -794,6 +797,12 @@ int main(const int argc, const char** argv)
 	catch (string& e) {ssexcept<<e;}
 	catch (exception& e) {ssexcept<<e.what();}
 	catch (...) {ssexcept<<"unknown exception";}
+	if (!ssexcept.str().empty()) cerr << red << Abrieviate(ssexcept.str()) << normal << endl;
+	if (!ssexcept.str().empty()) //Log(ssexcept.str());
+	{
+		cerr << red << ssexcept.str()<<endl;
+		stringstream ssout; ssout << fence << "[EXCEPT]" << fence << ssexcept.str(); Log(ssout.str());
+	}
 
 
 	return 0;

@@ -39,6 +39,7 @@ namespace Ipv4Caller
 			{
 				try 
 				{
+							Log( "TRY" );
 					txn = NULL;
 					env.txn_begin(NULL, &txn, 0);
 
@@ -46,22 +47,24 @@ namespace Ipv4Caller
 					Dbt key((char*)K.c_str(), K.size());
 
 					unsigned long many( 0 );
+							Log( "HMM" );
 
 					{	
 						BdbSpace::DbCursor cursor( *this );
 						const int found( cursor( txn, K ) );
 						if ( ! found ) 
 						{
-							stringstream sslog; sslog << "|IPDB|NOTFOUND|" << K << "|" << endl;
+							stringstream sslog; sslog << "|IPDB|NOTFOUND|" << boolalpha << USE_SSL << "|" << K << "|" << endl;
 							Log( sslog.str() );
 						} else {
 							Who* who( (Who*) cursor.GetData() );
 							many=who->count; 
-							stringstream sslog; sslog << "|IPDB|FOUND|" << K << "|" << many << endl;
+							stringstream sslog; sslog << "|IPDB|FOUND|" << boolalpha << USE_SSL << "|" << K << "|" << many << endl;
 							Log( sslog.str() );
 						}
 					}
 
+							Log( "WIP" );
 
 
 					Who& V( kv.second ); 
@@ -75,7 +78,8 @@ namespace Ipv4Caller
 						retry = false;
 						txn = NULL;
 					} catch (DbException &e) {
-						cerr << "x"; cerr.flush();
+						stringstream sslog; sslog << "|IPDB|DBCOMMITEXCEPTION|" << boolalpha << USE_SSL << "|" << K << "|"  << e.what() << "|" << endl;
+						Log( sslog.str() );
 					}
 				} catch (DbDeadlockException &) {
 					if (txn != NULL)
@@ -91,8 +95,11 @@ namespace Ipv4Caller
 					if (txn != NULL)
 						txn->abort();
 					retry = false;
+					stringstream sslog; sslog << "|IPDB|DBEXCEPTION|" << boolalpha << USE_SSL << "|" << e.what() << "|" << endl;
+					Log( sslog.str() );
 				} catch (std::exception &ee) {
-					cerr << "-"; cerr.flush();
+					stringstream sslog; sslog << "|IPDB|STDEXCEPTION|" << boolalpha << USE_SSL << "|" << ee.what() << "|" << endl;
+					Log( sslog.str() );
 					return false;
 				}
 			}
@@ -160,8 +167,14 @@ namespace Ipv4Caller
 
 	inline IpData::operator bool ()
 	{
-		mkdir( "ip4data", 0777  );
-		chdir( "ip4data" );
+		if ( USE_SSL )
+		{
+			mkdir( "ip4data", 0777  );
+			chdir( "ip4data" );
+		} else {
+			mkdir( "ip4data.secure", 0777  );
+			chdir( "ip4data.secure" );
+		}
 
 		environment=new BdbSpace::DataBaseEnvironment (  envFlags );
 		if ( ! (*environment) ) throw string("Can't create environment");
@@ -170,37 +183,11 @@ namespace Ipv4Caller
 		database=new Ipv4Caller::IpAddr ( "ipv4", *environment, openFlags, DB_BTREE, NULL );
 		if ( ! (*database) ) throw string( "Error loading db" ); 
 
-		Log("Started contract data"); 
+		Log("Started IP data"); 
 		chdir( ".." );
 		return true;
 	}
 
-#if 0
-	
-		mkdir( "testdata", 0777  );
-		chdir( "testdata" );
-
-		const u_int32_t envFlags =
-			DB_CREATE     |  // Create the environment if it does not exist
-			DB_RECOVER    |  // Run normal recovery.
-			DB_INIT_LOCK  |  // Initialize the locking subsystem
-			DB_INIT_LOG   |  // Initialize the logging subsystem
-			DB_INIT_TXN   |  // Initialize the transactional subsystem. This
-			// also turns on logging.
-			DB_INIT_MPOOL |  // Initialize the memory pool (in-memory cache)
-			DB_THREAD;       // Cause the environment to be free-threaded
-		BdbSpace::DataBaseEnvironment environment(  envFlags );
-		if ( ! environment ) throw string("Can't create environment");
-
-		const u_int32_t openFlags = DB_CREATE              | // Allow database creation
-			    DB_READ_UNCOMMITTED    | // Allow uncommitted reads
-			    DB_AUTO_COMMIT         | // Allow autocommit
-			    DB_THREAD; // Cause the database to be free-threaded 
-
-		{
-			Ipv4Caller::IpAddr database( "db", environment, openFlags, DB_BTREE);
-			if ( ! database ) throw string( "Error loading db" ); 
-#endif
 
 
 } // Ipv4Caller
