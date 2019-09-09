@@ -566,9 +566,6 @@ void* service(void* lk)
         PermissionedIps["127.0.0.1"] = 0;
 
         PermissionedIps["69.244.76.22"] = 0;
-        //PermissionedIps["149.134.173.200"] = 0;
-        //PermissionedIps["69.243.17.71"] = 0;
-        //PermissionedIps["98.233.128.99"] = 0;
 
 
 	{const int T((rand()%80)+300); usleep(T);}
