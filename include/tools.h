@@ -40,7 +40,7 @@ extern volatile bool KILL;
 namespace JTools
 {
 	using namespace OFormat;
-	void Log(const string& what) { if (1) syslog(1,what.c_str()); }
+	inline void Log(const string& what) { if (1) syslog(1,what.c_str()); }
 
 
 	struct stringvector : vector<string> 

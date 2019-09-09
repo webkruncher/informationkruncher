@@ -4,8 +4,16 @@
 #include <syslog.h>
 
 
+namespace JTools
+{
+	inline void Log(const string& what) ;
+}
+
+
+
 namespace Ipv4Caller
 {
+	using namespace JTools;
 	struct Who
 	{
 		Who( const string& _cookie ) : count( 0 ) {}
@@ -42,13 +50,15 @@ namespace Ipv4Caller
 					{	
 						BdbSpace::DbCursor cursor( *this );
 						const int found( cursor( txn, K ) );
-						if ( ! found ) cout << "Can't find " << K << endl;
-						else 
+						if ( ! found ) 
 						{
-							cout << "Found " << K << endl;
+							stringstream sslog; sslog << "|IPDB|NOTFOUND|" << K << "|" << endl;
+							Log( sslog.str() );
+						} else {
 							Who* who( (Who*) cursor.GetData() );
 							many=who->count; 
-							cout << "Many:" <<  many << endl;
+							stringstream sslog; sslog << "|IPDB|FOUND|" << K << "|" << many << endl;
+							Log( sslog.str() );
 						}
 					}
 
@@ -102,7 +112,7 @@ namespace Ipv4Caller
 		{
 			if ( database ) delete database;
 			if ( environment ) delete environment;
-			Log("Destroyed contract data"); 
+			Log("Destroyed ipv4 data"); 
 			database=NULL;
 			environment=NULL;
 			return true;
@@ -157,7 +167,7 @@ namespace Ipv4Caller
 		if ( ! (*environment) ) throw string("Can't create environment");
 
 
-		database=new Ipv4Caller::IpAddr ( "db", *environment, openFlags, DB_BTREE, NULL );
+		database=new Ipv4Caller::IpAddr ( "ipv4", *environment, openFlags, DB_BTREE, NULL );
 		if ( ! (*database) ) throw string( "Error loading db" ); 
 
 		Log("Started contract data"); 
