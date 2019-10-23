@@ -565,7 +565,7 @@ void* service(void* lk)
         IpRegistry PermissionedIps;
         PermissionedIps["127.0.0.1"] = 0;
 
-        PermissionedIps["69.244.76.22"] = 0;
+        PermissionedIps["73.132.52.161"] = 0;
 
 
 	{const int T((rand()%80)+300); usleep(T);}
