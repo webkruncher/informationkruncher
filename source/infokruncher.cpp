@@ -590,6 +590,7 @@ void* service(void* lk)
 			}
 
 			ss.close();
+			{const int T((rand()%100)+1000); usleep(T); }
 		}
 	}
 	catch (char* e) {ssexcept<<e;}
@@ -632,7 +633,7 @@ int main(const int argc, const char** argv)
 
 		vector<pid_t> children;
 
-		while ( children.size() < 4 )
+		while ( children.size() < 16 )
 		{
 			Log( "Spawn" );
 			const pid_t newfork( fork() );
