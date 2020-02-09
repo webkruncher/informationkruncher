@@ -486,6 +486,7 @@ void* service(void* lk)
 		while (!KILL)
 		{
 
+			{const int T((rand()%100)+1000); usleep(T); }
 			int sock(0);
 			{
 				ThreadWidget locker(lock);
@@ -589,7 +590,6 @@ void* service(void* lk)
 			}
 
 			ss.close();
-			{const int T((rand()%100)+1000); usleep(T); }
 		}
 	}
 	catch (char* e) {ssexcept<<e;}
