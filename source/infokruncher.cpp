@@ -59,7 +59,7 @@ using namespace OFormat;
 using namespace Hyper;
 volatile bool KILL(false);
 
-
+#include <signal.h>
 
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
@@ -526,8 +526,9 @@ void* service(void* lk)
 			Socket ss( sock, ssl );
 
 			SslContext sslcontext( ctx, ssl, ss );
-                        const string sslmsg( ( UsingSsl )  ? "USING SSL" : "USING PLAIN TEXT" );
-                        Log( string("From ") + ss.dotted()  +  sslmsg );
+                        const string sslmsg( ( UsingSsl )  ? " USING SSL" : " USING PLAIN TEXT" );
+			stringstream pidstr; pidstr<<"PID " << getpid() << " ";
+                        Log( pidstr.str() + string("From ") + ss.dotted()  +  sslmsg );
 
 
 			ss.timeout(8, 0);
@@ -617,6 +618,7 @@ int main(const int argc, const char** argv)
 	stringstream ssexcept;
 	try
 	{
+		Log("Initializing webkruncher");
 		init_openssl();
 		SockQ Q;
 		Locker& lock(Q.lock);
@@ -628,31 +630,56 @@ int main(const int argc, const char** argv)
 
 		if (!ssrvc.listen()) throw "Cannot listen";
 
-		vector<pthread_t> threads;
-		pthread_t t(NULL);
-		for (int j=0;j<8;j++)
+		vector<pid_t> children;
+
+		while ( children.size() < 4 )
 		{
-			pthread_create(&t,0,service,&Q);
-			if (!t) throw "Can't thread";
-			threads.push_back(t);
+			Log( "Spawn" );
+			const pid_t newfork( fork() );
+			if ( newfork == 0 )
+			{
+				vector<pthread_t> threads;
+				pthread_t t(NULL);
+				for (int j=0;j<8;j++)
+				{
+					pthread_create(&t,0,service,&Q);
+					if (!t) throw "Can't thread";
+					threads.push_back(t);
+				}
+
+				while (!KILL)
+				{
+					const int incoming(ssrvc.accept());
+					ThreadWidget locker(lock);
+					Q+=incoming;
+					{const int T((rand()%10)+20); usleep(T); }
+				}
+
+				Log("joining");
+
+				for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
+				{
+					pthread_t t(*it);
+					pthread_join(t, 0);
+				}
+				Log("exiting");
+			}  else {
+				children.push_back( newfork );
+			}
+		} 
+
+
+		while ( !KILL )
+		{
+			sleep(2);
 		}
 
-		while (!KILL)
+		for ( vector<pid_t>::iterator pit=children.begin();pit!=children.end();pit++)
 		{
-			const int incoming(ssrvc.accept());
-			ThreadWidget locker(lock);
-			Q+=incoming;
-			{const int T((rand()%10)+20); usleep(T); }
+			Log( "Parent killing child" );
+			kill(*pit, SIGKILL);
 		}
-
-		Log("joining");
-
-		for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
-		{
-			pthread_t t(*it);
-			pthread_join(t, 0);
-		}
-		Log("exiting");
+		Log( "Parent done" );
 		cleanup_openssl();
 	}
 	catch (const char* e) {ssexcept<<e;}
