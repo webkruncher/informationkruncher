@@ -24,9 +24,11 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef JTOOLS_H
+#define JTOOLS_H
 #include <sys/stat.h>
 #include <syslog.h>
-#include <oformat.h>
+//#include <oformat.h>
 #include <map>
 #include <sys/signal.h>
 #include <memory>
@@ -39,8 +41,9 @@ extern volatile bool KILL;
 
 namespace JTools
 {
-	using namespace OFormat;
+	//using namespace OFormat;
 	void Log(const string& what) { if (1) syslog(1,what.c_str()); }
+	//void Log(const string& what) { cerr << what.c_str() << endl; }
 
 
 	struct stringvector : vector<string> 
@@ -52,7 +55,11 @@ namespace JTools
                         while ( true )
                         {
                                 const size_t where( what.find( _how ) );
-                                if ( where  == string::npos ) return;
+                                if ( where  == string::npos ) 
+				{
+					if ( ! what.empty() ) push_back( what );
+					return;
+				}
                                 push_back( what.substr(0, where ) );
                                 what.erase( 0, where+ 1 );
                         }
@@ -268,6 +275,9 @@ namespace JTools
 		if (what.find(".jpeg ")!=string::npos) 
 			return "image/jpeg";
 
+		if (what.find(".gif ")!=string::npos) 
+			return "image/gif";
+
 		if (what.find(".jpg ")!=string::npos) 
 			return "image/jpeg";
 
@@ -285,6 +295,9 @@ namespace JTools
 
 		if (what.find(".xml ")!=string::npos) 
 			return "text/xml";
+
+		if (what.find(".json ")!=string::npos) 
+			return "application/json";
 
 		return "text/html";
 	}
@@ -476,6 +489,75 @@ namespace JTools
 	}
 
 
+	struct FileLocker
+	{
+		FileLocker( const string _fname, bool _mode ) 
+			: fname( _fname ), mode( _mode ), 
+			lockname( _fname + string( ".lock" )   )
+		{}
+		~FileLocker()
+		{
+			int times( 8 ); // 2 seconds
+			while ( times-- )
+			{
+				unlink( lockname.c_str() );
+				struct stat sb;
+				if (stat(lockname.c_str(), &sb)==0)
+				{
+					cerr << lockname << " still exists, trying to delete again" <<endl;
+					usleep( 250 );
+				}  else 
+					return;
+			}
+		}
+		operator bool ()
+		{
+			int times( 8 ); // 2 seconds
+			if ( ! mode )
+			{
+				// Wait until no lock fie
+				// Return false after a while
+				bool ok( false );
+				while ( ! ok )
+				{
+					struct stat sb;
+					if (stat(lockname.c_str(), &sb)==0)
+					{
+						cerr << lockname << " exists, waiting" <<endl;
+						usleep( 250 );
+						if ( ! ( times-- ) ) return false;
+					} else {
+						ofstream lockit( lockname.c_str() );
+						time_t now( time( 0 ) );
+						lockit << now;
+						return true; 
+					}
+				}
+				return false;
+			} else {
+			}
+		}
+		private:
+		const string fname;
+		const bool mode;
+		const string lockname;
+	};
+
+	struct RaiiMem
+	{
+		RaiiMem( unsigned long len ) : dest( NULL )
+		{
+			dest=  ( unsigned char * ) malloc( len )  ;
+		}
+		operator unsigned char* () { return dest; }
+		~RaiiMem()
+		{
+			if ( dest ) free( dest );
+		}
+		private:
+		unsigned char* dest;
+	};
 
 } // JTools
+#endif // JTOOLS_H
 

@@ -26,9 +26,55 @@
 */
 #ifndef HYPER_H
 #define HYPER_H
+//#include <uuid/uuid.h>
+
 
 namespace Hyper
 { 
+
+	inline string SlashedCookie( string cook )
+	{
+		stringstream ssp;
+		JTools::stringvector parts;
+		parts.split( cook, "-" );
+		for ( JTools::stringvector::iterator it=parts.begin();it!=parts.end();it++)
+		{
+			if ( it != parts.begin() ) ssp << "/";
+			ssp << (*it );
+		}
+		return ssp.str();
+	}
+
+	inline string UniqCookie()
+	{
+#if 0
+		if ( USE_SSL == 1 ) 
+		{
+			uuid_t out;
+			uuid_generate(out);
+
+			char uuid_str[37];      
+
+			string fname;
+			do {
+				uuid_unparse_lower(out, uuid_str);
+				cerr << "cookie:" << uuid_str << endl;
+				fname="text/cookies/";
+				fname+=uuid_str;
+			} while ( JTools::FileExists( fname ) );
+			stringstream ssout; 
+			ssout << fence << "NEWCOOKIE" << fence << uuid_str << fence ;
+			Log(ssout.str());
+			cerr << ssout.str() << endl;
+
+			ofstream ofs( fname.c_str() );
+
+			return uuid_str;
+		}
+#endif
+		return "";
+	}
+
 	struct Response : oformat
 	{
 		Response() : oformat(cerr) {}
@@ -42,6 +88,48 @@ namespace Hyper
 		const char* c_str() const {return request.c_str();}
 		operator Socket& () const {return sock;}
 		string Host() const { return host; }
+		string ExpiryTime()
+		{ 
+			char buf[1000];
+			time_t now = time(0);
+			now+=(60*60*24*1);
+			struct tm tm = *gmtime(&now);
+			strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+			return string( buf );
+		}
+		string Cookie()
+		{
+			if ( USE_SSL == 1 ) 
+				if ( sock.auth & KRUNCH_PERMIT_IP )
+				{
+					const string cook( fullvalue( "cookie" )  );
+					size_t idp( cook.find( "__Secure-ID=" ) );
+					if ( idp == string::npos) return "";
+					idp+=strlen("__Secure-ID=");
+					size_t edp( cook.find_first_of( " \r\n\t;", idp ) );
+					if ( edp == string::npos ) 
+						edp=cook.size();
+					const string cookie( cook.substr( idp, edp-idp ) );
+					return cookie;
+				}
+			return "";
+		}
+
+
+		stringmap& Form()
+		{
+			stringvector parts;
+			parts.split( text, "&" );
+			for ( stringvector::iterator it=parts.begin();it!=parts.end();it++)
+			{
+				stringvector pieces;
+				pieces.split( *it, "=" );
+				if ( pieces.size() == 2 )
+					form[ pieces[ 0 ] ] = pieces[ 1 ];
+			}
+			return form;
+		}
+
 		string Headers()
 		{
 			stringstream mout;
@@ -62,6 +150,64 @@ namespace Hyper
 			}
 			return true;
 		}
+		string fullvalue( string what ) 
+		{
+			stringstream ssv; ssv << what << ":";
+			for (icstringvector::const_iterator it=headers.begin();it!=headers.end();it++)
+			{
+				icstring line(*it);
+				if (line.find( ssv.str().c_str() )==0) return (line.c_str());
+			}
+			return "";
+		}
+		string value( string what ) 
+		{
+			stringstream ssv; ssv << what << ":";
+			for (icstringvector::const_iterator it=headers.begin();it!=headers.end();it++)
+			{
+				icstring line(*it);
+				if (line.find( ssv.str().c_str() )==0) return mimevalue(line.c_str());
+			}
+			return "";
+		}
+
+
+
+		bool ReadPost()
+		{
+				string slen( value("content-length") );
+				long len( atol( slen.c_str() ) );
+				
+				// scope for raii
+				{
+					JTools::RaiiMem raiimem( len );
+					unsigned char* dest( raiimem );
+					
+					if ( ! dest ) return false;
+					sock.read( (char*) dest, len );
+
+					payload.assign( dest, len );
+				}
+				return true;
+
+		}
+		bool IsPayloadText()
+		{
+			for (basic_string<unsigned char>::iterator it=payload.begin();it!=payload.end();it++)
+			{
+				unsigned char t( *it );
+				char c( (char) t );
+				if ( ! isascii( c ) ) return false;
+			}
+			text.assign( (char*)payload.data(), payload.size() );
+			return true;
+		}
+		basic_string<unsigned char> payload;
+		string text;
+		stringmap form;
+
+
+
 		string host; Socket& sock;
 		protected:
 		string mimevalue(string line)

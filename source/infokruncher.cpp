@@ -25,16 +25,19 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// GenerateCerts  ca.crt         ca.key         openssl.cnf    server.crt     server.csr
+#define HOME "/home/jmt/.ssh/"
 
-#define HOME "/home/example"
+#define CA_DIR  "comodo/"
+#define CERT_FILE  HOME CA_DIR "jackmthompson_ninja.crt"
+#define KEY_FILE  HOME  "jackmthompson.key"
 
-#define CERT_FILE  HOME "example.crt"
-#define KEY_FILE  HOME  "example.key"
-
-#define CA_FILE "example.pem"
-#define CA_DIR  NULL
+//#define CA_FILE "ca.crt"
+#define CA_FILE  "COMODORSADomainValidationSecureServerCA.crt"
 
 #define KEY_PASSWD ""
+#include <stdio.h>
+#include <time.h>
 
 #include <deque>
 #include <iostream>
@@ -47,6 +50,7 @@ using namespace std;
 using namespace InformationSocket;
 #include "tools.h"
 using namespace JTools;
+#include "Directory.h"
 
 #include <oformat.h>
 using namespace OFormat;
@@ -59,7 +63,9 @@ using namespace OFormat;
 using namespace Hyper;
 volatile bool KILL(false);
 
-
+#include "securitycheck.h"
+//#include "login.h" // Deprecated, unused
+#include "User.h"
 
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
@@ -105,35 +111,57 @@ string Example(const icstring& request, const Request& req)
 	return target;
 }
 
+string Foward2Ninja(const icstring& request, const Request& req)
+{
+        string srequest(request.c_str());
+        stringstream ssout; ssout << fence << "[2NINJA]" << fence << request << fence ; Log(ssout.str());
+        return "WebKruncher.text/Fwd2Ninja.html";
+}
 
+string Jmt(const icstring& request, const Request& req)
+{
+        string srequest(request.c_str());
+                stringstream ssout; ssout << fence << "[JMT]" << fence << request << fence ; Log(ssout.str());
+        if ( request.find("wip.html") != icstring::npos)
+        {
+                stringstream ssout; ssout << fence << "[WIP]" << fence << request << fence ; Log(ssout.str());
+                return "WebKruncher.text/wip.html";
+        }
+        const string target(Target("WebKruncher.text", RequestUrl(request.c_str())));
+        //cout << "<target name="<<target<<" />" << endl;
+        stringstream ssout2; ssout2 << fence << "[JMT]" << fence << target << fence ; Log(ssout2.str());
+        return target;
+}
 
 string Tbd(const icstring& request, const Request& req)
 {
 	const icstring host(req.Host().c_str());
 	{stringstream ssout; ssout << fence << "[TBD]" << fence << host << fence << request.c_str() << fence ; Log(ssout.str());}
 
-	if 
-	(
-		(host.find("example.ninja")!=string::npos) 
-	)
-	{ 
-		return Example(request, req);
-	}
-	if (host.find("localhost")!=string::npos) return Example(request, req);
+                if (request.find("get /test.json ") == 0 )
+		{
+				
+			cerr << "TESTREQUEST:" << request.c_str() << endl;
+                        return "WebKruncher.text/test.json";
+		}
 
 
+#if 0
         {
                 if (request.find("get / ") == 0 )
                 {
+			//cerr << "getting the index " << endl;
                         stringstream ssout; ssout << fence << "[SomethingElse]" << fence << request << fence ; Log(ssout.str());
-                        return "WebKruncher.text/wip.html";
+                        return "WebKruncher.text/index.html";
                 }
-                return Example(request, req);
         }
+#endif
 
+	return Jmt(request, req);
 
-	string ret("index.html");
-	return ret;
+	//string ret("WebKruncher.text/index.html");
+	//return ret;
+	//return NULL;
 }
 
 struct Response_NotFound : Response
@@ -155,7 +183,8 @@ struct Response_NotFound : Response
 		status=404;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -176,6 +205,140 @@ struct Response_NotFound : Response
 	virtual ostream& operator<<(ostream& o) const { o << fence << "[NOTFOUND]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence << request.Headers(); return o; }
 };
 
+struct Response_Secure : Response
+{
+	Response_Secure(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
+	virtual void operator ()()
+	{
+		Socket& sock(request);
+		sock.flush();
+		stringstream ss;
+
+		string srequest(request.c_str());
+
+		string file(tbd.c_str());
+		const string contenttype(ContentType(srequest));
+
+
+		LoadFile(file.c_str(), ss);
+
+		const string Cookie(request.Cookie());
+
+		cerr << fence << "SECURE" << fence << Cookie << fence << endl;
+
+
+		status=200;
+		if ( Cookie.empty() ) 
+		{
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+				if ( USE_SSL == 1 )
+				{
+					stringstream sslogin;
+					LoadFile("login.html", sslogin);
+					ss << sslogin.str();
+				}
+		} else {
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+			{
+				string UserName;
+				const string CookiePath( InformationSocket::CookiePathFromSock( Cookie, sock ) ) ;
+
+
+				if ( request.ReadPost() )
+					if ( request.IsPayloadText() )
+					{
+
+						stringmap& form( request.Form() );
+						if ( form.size() > 1 )
+						{
+							const string checkname( form[ "uname" ] );
+							const string psw( form[ "psw" ] );
+
+							stringstream ss;
+							ss << "|SECURE|ATTEMPT|" << checkname << fence << psw << fence << endl;
+							Log (ss.str());
+
+							if ( checkname == "jmt" )
+								if ( psw == "pwd" )
+									UserName=checkname;
+						}
+					}
+
+				if ( !UserName.empty() )
+				{
+					const string UserPath( CookiePath + string( "/user/" ) + UserName );
+					const string UserPropertiesFile( UserPath + string( "/properties" ) );
+//					JTools::assertpath( UserPath );
+
+					struct stat sb;
+					if (stat(UserPropertiesFile.c_str(), &sb)==0)
+					{
+						stringstream ssout; ssout << fence << "[SECURE][COOKIE]" << fence << "UserPropertiesFileExists" << fence << UserPropertiesFile << fence; 
+						Log (ssout.str());
+						cerr << ssout.str() << endl;
+
+						ifstream cf( UserPropertiesFile.c_str() );
+						while ( ! cf.eof() )
+						{
+							string line;
+							getline( cf, line );
+							cerr << line << endl;
+						}
+
+					} else {
+						JTools::FileLocker flock( UserPropertiesFile, false );
+						if ( flock )
+						{
+							stringstream ssout; ssout << fence << "[SECURE][COOKIE]" << fence << "NewUserPropertiesFile" << fence << UserPropertiesFile << fence; 
+							cerr << ssout.str() << endl;
+							Log (ssout.str());
+							ofstream cf( UserPropertiesFile.c_str() );
+							cf << "|Cookie|" << Cookie << fence << endl; 
+							cf << "|User|" << UserName << fence << endl; 
+						} else {
+							stringstream ssout; ssout << fence << "[SECURE][COOKIE]" << fence << "CannotLock" << fence << UserPropertiesFile << fence; 
+							cerr << ssout.str() << endl;
+							Log (ssout.str());
+							stringstream sslogin;
+							LoadFile("login.html", sslogin);
+							ss << sslogin.str();
+						}
+					}
+				} else {
+					stringstream ssout; ssout << fence << "[SECURE][POST]" << fence << "CannotReadPost" << fence; 
+					cerr << ssout.str() << endl;
+					Log (ssout.str());
+					stringstream sslogin;
+					LoadFile("login.html", sslogin);
+					ss << sslogin.str();
+				}
+			}
+
+		}
+
+		stringstream response;
+	
+		response <<  "HTTP" << "/1.1 ";
+		response << status << " " << statusText(status) << endl;
+		response << "Content-Type: " << contenttype << endl;
+		if ( USE_SSL == 1 ) response << "Strict-Transport-Security: max-age=15768000" << endl;
+		response << "Server: WebKruncher" << endl;
+		response << "Connection: close" << endl;
+		response << "Content-Length:" << ss.str().size() << endl;
+		response << endl;
+		response << ss.str();
+		sock.write(response.str().c_str(), response.str().size());
+		sock.flush();
+		stringstream ssout; ssout << fence << "[SECURE]" << fence << Cookie << file << fence << contenttype << fence; Log(ssout.str());
+	}
+	protected:
+	const string tbd;
+	Request& request;
+	int& status;
+	private:
+	virtual ostream& operator<<(ostream& o) const { o << fence << "[home]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
+};
+
 struct Response_Home : Response
 {
 	Response_Home(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
@@ -190,11 +353,249 @@ struct Response_Home : Response
 		string file(tbd.c_str());
 		const string contenttype(ContentType(srequest));
 
-		LoadFile(file.c_str(), ss);
+		const string Cookie(request.Cookie());
+		cerr << fence << "HOME" << fence << Cookie << fence << endl;
+
+		status=200;
+		if ( USE_SSL == 1 )
+		{
+			if ( Cookie.empty() ) 
+			{
+				if ( sock.auth & KRUNCH_PERMIT_IP )
+				{
+					LoadFile("mustcookie.html", ss );
+				} else {
+					ss << "Unauthorized access";
+					status=403;
+				}
+			}  else {
+
+				LoadFile(file.c_str(), ss);
+
+				if ( ! Cookie.empty() ) 
+					if ( sock.auth & KRUNCH_PERMIT_IP )
+						if ( USE_SSL == 1 )
+						{
+							stringstream sslogin;
+							LoadFile("login.html", sslogin);
+							ss << sslogin.str();
+						}
+			}
+
+		} else {
+			LoadFile(file.c_str(), ss);
+		}
+
+
+
+		stringstream response;
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
+		response << status << " " << statusText(status) << endl;
+		response << "Content-Type: " << contenttype << endl;
+		if ( USE_SSL == 1 ) response << "Strict-Transport-Security: max-age=15768000" << endl;
+		response << "Server: WebKruncher" << endl;
+		response << "Connection: close" << endl;
+		response << "Content-Length:" << ss.str().size() << endl;
+
+
+
+		if ( Cookie.empty() )  
+		{
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+			{
+				//cout << request.Headers() << endl;
+
+
+				const string when( request.ExpiryTime() );
+				const string ucook( Hyper::UniqCookie() );
+				const string CookiePath( InformationSocket::CookiePathFromSock( ucook, sock ) ) ;
+				const string CookieFile( CookiePath + string( "/cookie" ) );
+				//cerr << "CookiePath: " << CookiePath << endl;	
+//				JTools::assertpath( CookiePath );
+				//cerr << "CookieFile: " << CookieFile << endl;	
+
+				struct stat sb;
+				if (stat(CookieFile.c_str(), &sb)==0)
+				{
+					stringstream ssout; ssout << fence << "[HOME][COOKIE]" << fence << "CookieFileExists" << fence << CookieFile << fence; 
+					Log (ssout.str());
+				} else {
+					stringstream ssout; ssout << fence << "[HOME][COOKIE]" << fence << "NewCookieFile" << fence << CookieFile << fence; 
+					Log (ssout.str());
+					ofstream cf( CookieFile.c_str() );
+					cf << ucook;
+				}
+
+
+				stringstream ssc;
+				ssc<< "Set-Cookie: __Secure-ID=" << ucook << "; Expires=" << when << "; Secure; HttpOnly; Domain=jackmthompson.ninja; Path=/; ";
+				response << ssc.str() << endl;
+			}
+		}
+		response << endl;
+		response << ss.str();
+		sock.write(response.str().c_str(), response.str().size());
+		sock.flush();
+		stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
+	}
+	protected:
+	const string tbd;
+	Request& request;
+	int& status;
+	private:
+	virtual ostream& operator<<(ostream& o) const { o << fence << "[home]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
+};
+
+struct Response_JMeter : Response
+{
+	Response_JMeter(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
+
+
+#if 0
+               ct = "text/html"
+                if s.path=='/jmt': ct="text/xml"
+                if s.path=='/': ct="text/xml"
+                if s.path=='/Assertions': ct="text/xml"
+                if s.path=='/xslt': ct="text/xslt"
+                if s.path=='/js': ct="text/js"
+                if s.path=='/css': ct="text/css"
+
+                if s.path=='/favicon.ico':
+                        sys.stderr.write( "Doesnt exist" + s.path + "\n")
+                        s.send_response(400)
+                        s.send_header("Content-type", ct )
+                        s.end_headers()
+                        s.wfile.write( "<html>not found</html>" )
+                        return
+
+                s.send_response(200)
+                s.send_header("Content-type", ct )
+                s.end_headers()
+
+                FileName=''
+
+                if s.path=='/jmt': FileName="jmeter/Recording.jmt.test.xml"
+
+                if s.path=='/': FileName="jmeter/Recording.xml"
+                if s.path=='/Assertions': FileName="jmeter/Assertions.xml"
+
+
+                if s.path=='/js': FileName="jmeterreport.js"
+                if s.path=='/xslt': FileName="jmeterreport.xslt"
+                if s.path=='/css': FileName="jmeterreport.css"
+                if s.path=='/htmlreport': FileName="jmeterreport.html"
+
+
+                if FileName.endswith('.xml' ):
+                        LineOne="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        LineTwo="<?xml-stylesheet type=\"text/xsl\" href=\"/xslt\"?>\n"
+                        s.wfile.write( LineOne )
+                        s.wfile.write( LineTwo )
+#endif
+
+	
+
+
+	struct Stuff
+	{
+		stringstream ss;
+		string contenttype;
+		long status;
+
+		void operator()( icstring req )
+		{
+			if ( req.find( "get /jmeter/xml " ) == 0 )
+			{
+				contenttype="text/xml";
+				status=200;
+				ifstream in( "text/swift/jmeter/Recording.xml" );
+				while ( ! in.eof() )
+				{
+					string line;
+					getline( in, line );
+					if ( ss.str().empty() )
+					{
+						ss << line << endl;
+						ss << "<?xml-stylesheet type=\"text/xsl\" href=\"/jmeter/xslt\"?>" << endl;
+					} else {
+						ss << line << endl;
+					}
+				}
+
+				return;
+			}
+
+			if ( req.find( "get /jmeter/xslt " ) == 0  ) 
+			{
+				contenttype="text/xslt";
+				status=200;
+				ifstream in( "text/swift/jmeterreport.xslt" );
+				while ( ! in.eof() )
+				{
+					string line;
+					getline( in, line );
+					ss << line << endl;
+				}
+
+				return;
+			}
+		}
+	} stuff;
+
+
+	virtual void operator ()()
+	{
+		Socket& sock(request);
+		sock.flush();
+		stringstream ss;
+
+		string srequest(request.c_str());
+		icstring icsrequest(request.c_str());
+
+		stuff( icsrequest );
+
+		stringstream response;
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
+		response << status << " " << statusText(stuff.status) << endl;
+		response << "Content-Type: " << stuff.contenttype << endl;
+		response << "Server: WebKruncher" << endl;
+		response << "Connection: close" << endl;
+		response << "Content-Length:" << stuff.ss.str().size() << endl;
+		response << endl;
+		response << stuff.ss.str();
+		sock.write(response.str().c_str(), response.str().size());
+		sock.flush();
+		stringstream ssout; ssout << fence << "[HOME]" << fence  ; Log(ssout.str());
+	}
+	protected:
+	const string tbd;
+	Request& request;
+	int& status;
+	private:
+	virtual ostream& operator<<(ostream& o) const { o << fence << "[home]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
+};
+
+struct Response_Posted : Response
+{
+	Response_Posted(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
+	virtual void operator ()()
+	{
+		Socket& sock(request);
+		sock.flush();
+		stringstream ss;
+		ss << tbd;
+
+		string srequest(request.c_str());
+
+		const string contenttype("text/html");
+
 		status=200;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -204,7 +605,7 @@ struct Response_Home : Response
 		response << ss.str();
 		sock.write(response.str().c_str(), response.str().size());
 		sock.flush();
-		stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence; Log(ssout.str());
+		stringstream ssout; ssout << fence << "[HOME]" << fence ; Log(ssout.str());
 	}
 	protected:
 	const string tbd;
@@ -231,7 +632,8 @@ struct Response_Ping : Response
 		status=200;
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -278,7 +680,8 @@ struct Response_Binary : Response
 		const size_t fsize(FileSize(tbd));
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		//response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+		response <<  "HTTP" << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
 		response << "Server: WebKruncher" << endl;
@@ -337,7 +740,7 @@ struct Response_Binary : Response
 				unsent=much-sent;
 				pcnt=(((double)sent/(double)much)*100);
 			}
-			if (pcnt != 100.00) cerr << "wrote " << setw(8) << sent << " bytes, leaving " << unsent << " bytes, which is " << pcnt << "% of " << much << " requested.   ttl sent: " << setw(8) << bwrit << cleol << crgret << flsh;
+			//if (pcnt != 100.00) cerr << "wrote " << setw(8) << sent << " bytes, leaving " << unsent << " bytes, which is " << pcnt << "% of " << much << " requested.   ttl sent: " << setw(8) << bwrit << cleol << crgret << flsh;
 		}
 	}
 	virtual ostream& operator<<(ostream& o) const { o << fence << "[binary]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
@@ -350,13 +753,13 @@ struct Response_Page : Response
 	{
 		Socket& sock(request);
 		sock.flush();
-		stringstream ss;
+		stringstream ssplaintext, sssecure;
 
 		string srequest(request.c_str());
 		string file(tbd.c_str());
 		string contenttype(ContentType(srequest));
-		{stringstream ssout; ssout << fence << "[PAGE]" << fence << contenttype << fence << tbd << fence; Log(ssout.str());}
-		status=200;
+		{stringstream ssout; ssout << fence << "[PAGESTART]" << "cookie" << fence << contenttype << fence << tbd << fence; Log(ssout.str());}
+
 		if (FileExists(file.c_str())) 
 		{
 			if ( 
@@ -365,24 +768,99 @@ struct Response_Page : Response
 				( file.find("ajax/Everything.js") != string::npos )
 			)
 			{
-				{stringstream ssout; ssout << fence << "[AUTHED]" << fence << contenttype << fence << tbd << fence << ss.str() << fence ; Log(ssout.str());}
+				{stringstream ssout; ssout << fence << "[AUTHED]" << fence << contenttype << fence << tbd << fence << ssplaintext.str() << fence ; Log(ssout.str());}
 			}
-			LoadFile(file.c_str(), ss);
-		} else {LoadFile("notfound.html",ss); contenttype="text/html";}
+			//cerr << "Loading: " << file << endl;
+			LoadFile(file.c_str(), ssplaintext);
+		} else {LoadFile("notfound.html",ssplaintext); contenttype="text/html";}
+
+		const string Cookie(request.Cookie());
+		//cerr << fence << "PAGE" << fence << Cookie << fence << endl;
+			
+
+		const string CookiePath( InformationSocket::CookiePathFromSock( Cookie, sock ) ) ;
+		const string CookieFile( CookiePath + string( "/cookie" ) );
+		//JTools::assertpath( CookiePath );
+
+		struct stat sb;
+#if 0
+		if (stat(CookieFile.c_str(), &sb)==0)
+		{
+			stringstream ssout; ssout << fence << "[PAGE][COOKIE]" << fence << "CookieFileExists" << fence << CookieFile << fence; 
+			//cerr << ssout.str() << endl;
+			Log (ssout.str());
+			//cerr << ssout.str() << endl;
+			ifstream cf( CookieFile.c_str() );
+			while ( ! cf.eof() )
+			{
+				string line;
+				getline( cin, line );
+				//cerr << line << endl;
+			}
+		}
+#endif
+
+		if ( Cookie.empty() ) 
+		{
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+				if ( USE_SSL == 1 )
+				{
+					stringstream sslogin;
+					LoadFile("mustcookie.html", sslogin);
+					sssecure << sslogin.str();
+				}
+		} else {
+			if ( sock.auth & KRUNCH_PERMIT_IP )
+				if ( USE_SSL == 1 )
+					if ( file == "WebKruncher.text/Left.xml" )
+					{
+						string placer( ssplaintext.str() );
+						size_t where( placer.find("<!-- login  -->") );
+						stringstream sslogin;
+						if ( sock.auth & KRUNCH_PERMIT_LOGGEDIN )
+						{
+							LoadFile("WebKruncher.text/UserPrefMenu.xml", sslogin);
+							//cerr << "Loaded Left For Logged In connection" << endl << placer << endl;
+						} else {
+							LoadFile("WebKruncher.text/LoginMenu.xml", sslogin);
+							//cerr << "Loaded Left For Login for permissioned ssh connection" << endl << placer << endl;
+						}
+						placer.insert( where, sslogin.str() );
+						sssecure << placer; 
+					}
+		}
 
 
+
+
+		status=200;
+
+
+
+		stringstream ss;
+		if ( sssecure.str().size() )
+			ss << sssecure.str();
+		else 
+			ss << ssplaintext.str();
+
+			
 
 		stringstream response;
-		response << ( ( USE_SSL == 1 ) ? "HTTPS" : "HTTP" ) << "/1.1 ";
+
+		response <<  "HTTP" << "/1.1 ";
 		response << status << " " << statusText(status) << endl;
 		response << "Content-Type: " << contenttype << endl;
+		if ( USE_SSL == 1 ) response << "Strict-Transport-Security: max-age=15768000" << endl;
 		response << "Server: WebKruncher" << endl;
 		response << "Connection: close" << endl;
 		response << "Content-Length:" << ss.str().size() << endl;
 		response << endl;
 		response << ss.str();
+//if ( tbd == "WebKruncher.text/test.json" )
+//	cerr << response.str() << endl;
 		sock.write(response.str().c_str(), response.str().size());
 		sock.flush();
+		stringstream ssout2; ssout2 << fence << "[PAGEEND]" << fence << Cookie << file << fence << contenttype << fence; Log(ssout2.str());
 	}
 	protected:
 	Request& request;
@@ -392,6 +870,14 @@ struct Response_Page : Response
 	virtual ostream& operator<<(ostream& o) const { o << fence << "[page]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 };
 
+
+void trigger()
+{
+	ofstream oo( "/home/fabric/info.cron", ios::app );
+	time_t now( time( NULL ) );
+	oo << "Triggered by the kruncher @ " << asctime( localtime( &now ) );
+}
+
 struct RequestManager : Request
 {
 	RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock) :
@@ -399,14 +885,71 @@ struct RequestManager : Request
 	operator Response* ()
 	{
 		Response* ret(NULL);
+		{
+			if (request.find("GET /trigger") == 0 )
+				trigger();
+
+			if (request.find("POST /contract") == 0 )
+			{
+				string slen( value("content-length") );
+				long len( atol( slen.c_str() ) );
+				
+				unsigned char* dest( ( unsigned char * ) malloc( len )  );
+				if ( ! dest ) return new Response_Posted(*this, "Cannot allocate memory for post data", status);
+				sock.read( (char*) dest, len );
+
+				basic_string<unsigned char> buffer;
+				buffer.assign( dest, len );
+				free( dest );
+
+				const size_t eoch( buffer.find_first_of( ( unsigned char * ) "\r\n" ) );
+				if ( eoch == string::npos ) return new Response_Posted(*this, "Cannot find first post data tag", status);
+
+				string tag;
+				tag.assign( ( char * ) buffer.data(), eoch ); 
+				if ( tag.size() < 3 ) return new Response_Posted(*this, "invalid content tag", status);
+
+				basic_string<unsigned char> content;
+
+				const size_t etag( buffer.find( ( unsigned char * ) tag.data(), eoch ) );
+				if ( etag == string::npos ) return new Response_Posted(*this, "Cannot find second post data tag", status);
+
+				content.assign( (unsigned char*) buffer.data()+eoch, etag-eoch );
+
+				size_t eolen( 4 );
+				size_t eoh( content.find( ( unsigned char* ) "\r\n\r\n" ) );
+				if ( eoh==string::npos) { eolen=2; eoh=( content.find( ( unsigned char* ) "\r\r" ) ); }
+				if ( eoh==string::npos) { eolen=2; eoh=( content.find( ( unsigned char* ) "\n\n" ) ); }
+				if ( eoh==string::npos) return new Response_Posted(*this, "Cannot find end of content mime", status);
+
+
+				eoh+=eolen;
+				basic_string<unsigned char> payload;
+				payload.assign( content.data()+eoh, content.size()-eoh-2 );
+				ofstream oo( "posted" );
+				oo.write( ( char* ) payload.data(), payload.size() );
+
+
+
+				stringstream sstbd;
+				sstbd << "Request processing" << endl;
+				
+				stringstream ssout; ssout << fence << "[ContractPost]" << fence ; Log(ssout.str());
+				return new Response_Posted(*this, sstbd.str(), status);
+			}
+		}
 		const string tbd(Tbd(request, *this));
 		ret=ifBinary(tbd);
 		if (ret) return ret;
-		//if (request.find("GET /src ")==0) return new Response_SrcSys(*this, tbd, status);
 		if (request.find("/?ping ")!=string::npos) return new Response_Ping(*this, tbd, status);
 		if (request.find("GET / ")==0) return new Response_Home(*this, tbd, status);
+		if (request.find("POST / ")==0) return new Response_Secure(*this, tbd, status);
 		if (tbd.empty()) return new Response_NotFound(*this, status);
-		else return new Response_Page(*this, tbd, status);
+		else 
+		{
+			//cout << "Using ResponsePage"<<endl;
+			return new Response_Page(*this, tbd, status);
+		}
 		return new Response_NotFound(*this, status);
 	}
 	private:
@@ -449,27 +992,11 @@ struct SockQ
 	deque<int> socks;
 };
 
-struct IpRegistry : map<string, unsigned long>
-{
-        bool operator()(const string addr)
-        {
-                iterator it( find( addr ) );
-                if ( it == end() ) return false;
-                it->second++;
-                return true;
-        }
-};
-
 
 
 void* service(void* lk)
 {
-
-        IpRegistry PermissionedIps;
-        PermissionedIps["127.0.0.1"] = 0;
-        PermissionedIps["149.134.173.200"] = 0;
-        PermissionedIps["69.243.17.71"] = 0;
-        PermissionedIps["98.233.128.99"] = 0;
+        UserRegistry UserPermissions;
 
 
 	{const int T((rand()%80)+300); usleep(T);}
@@ -556,13 +1083,15 @@ void* service(void* lk)
                         }
                         const string addr( ipaddr[ 0 ] );
 
-                        if ( PermissionedIps( addr ) )
-                        {
-                                stringstream ssout; ssout << fence << "[PERMISSIONEDIP]" << fence << addr << fence; Log (ssout.str());
-				ss.auth|=KRUNCH_PERMIT_IP;
-                        } else {
-                                stringstream ssout; ssout << fence << "[OTHERIP]" << fence << addr << fence; Log (ssout.str()); 
-                        }
+                        ss.auth=UserPermissions( addr );
+			if ( ss.auth == KRUNCH_IP_BLOCKED )
+			{
+				cerr << "THIS IP IS BLOCKED" << endl;
+				ss.close();
+				{const int T((rand()%50)+10); usleep(T); }
+				continue;
+			}
+
 
 
 			{
@@ -604,12 +1133,13 @@ void* service(void* lk)
 int main(const int argc, const char** argv)
 {
 	cout << "Starting infokruncher." << SERVICE_PORT << endl;
-	SetSignals();
 	CmdLine cmdline(argc, argv);
 	if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
 	else cerr << "Loading infokruncher in test mode" << endl;
+	if (!cmdline.exists("-d")) SetSignals();
 	if (!cmdline.exists("-d")) Daemonizer daemon(argv[0]);
-	SetSignals();
+	if (cmdline.exists("-sc")) 
+		return SecurityCheck::main( cmdline );
 	srand(time(0));
 	stringstream ssexcept;
 	try
@@ -661,4 +1191,5 @@ int main(const int argc, const char** argv)
 	return 0;
 }
 
+// wip
 

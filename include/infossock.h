@@ -47,6 +47,8 @@
 #include <openssl/err.h>
 
 #define KRUNCH_PERMIT_IP 0X10
+#define KRUNCH_PERMIT_LOGGEDIN 0X20
+#define KRUNCH_IP_BLOCKED 0X8000
 
 namespace InformationSocket
 {
@@ -403,7 +405,8 @@ return 1;
 		const SSL_METHOD *method;
 		SSL_CTX *ctx;
 
-		method = SSLv23_server_method();
+		//method = SSLv23_server_method();
+		method = TLSv1_2_server_method();
 
 		ctx = SSL_CTX_new( method );
 
@@ -413,10 +416,20 @@ return 1;
 			throw string( "Cannot create SSL context" );
 		}
 
+
+
+
+
+
 		return ctx;
 	}
 
-
+	int pem_passwd_cb(char *buf, int size, int rwflag, void *userdata)
+	{
+		//cout << "pem_passwd_cb" << endl;
+		return 0;
+	}
+	
 
 
 
@@ -425,16 +438,24 @@ return 1;
 	{
 		if ( ! ctx ) return NULL;
 		SSL_CTX_set_ecdh_auto(ctx, 1);
-
-		if (SSL_CTX_use_certificate_file(ctx, CERT_FILE, SSL_FILETYPE_PEM) <= 0) {
-			ERR_print_errors_fp(stderr);
-			exit(EXIT_FAILURE);
+		stringstream ssf;
+		ssf<<CERT_FILE;
+		//cout << "Cert:"<<CERT_FILE<<";" << endl;
+		if (SSL_CTX_use_certificate_file(ctx, ssf.str().c_str(), SSL_FILETYPE_PEM) <= 0) {                                                            
+			stringstream ssm; ssm << "cannot load cert:"<< ssf.str().c_str()<<";"<<endl;
+			throw string( ssm.str().c_str());
 		}
 
+
+		SSL_CTX_set_default_passwd_cb( ctx, pem_passwd_cb );
 		SSL_CTX_set_default_passwd_cb_userdata(ctx,( char* ) KEY_PASSWD);
 
+		stringstream ssk;
+		ssk<<KEY_FILE;
 
-		if (SSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM) <= 0 ) {
+		//cout << "Key:"<<ssk.str()<<";" << endl;
+
+		if (SSL_CTX_use_PrivateKey_file(ctx, ssk.str().c_str(), SSL_FILETYPE_PEM) <= 0 ) {
 			ERR_print_errors_fp(stderr);
 			exit(EXIT_FAILURE);
 		}
@@ -445,16 +466,22 @@ return 1;
 			exit(0);
 		}
 
+		stringstream sscaf;
+		sscaf<<HOME << CA_DIR << CA_FILE ;
+		//cout << "\033[32mSetup ca:" << sscaf.str() << ";\033[0m" << endl;
 
-		//  SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,NULL);
+#if 1
 
+		//SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,NULL);
+		SSL_CTX_set_verify(ctx,SSL_VERIFY_NONE,NULL);
+		//if (SSL_CTX_load_verify_locations(ctx,sscaf.str().c_str(),NULL)<1) {
 
-		if (SSL_CTX_load_verify_locations(ctx,CA_FILE,CA_DIR)<1) {
+		if (SSL_CTX_load_verify_locations(ctx,sscaf.str().c_str(),NULL)<1) {
 			printf("Error setting the verify locations.\n");
 			exit(0);
 		}
-
-		return SSL_load_client_CA_file(CA_FILE);
+#endif
+		return SSL_load_client_CA_file(sscaf.str().c_str());
 	}
 
 	struct SslContext
