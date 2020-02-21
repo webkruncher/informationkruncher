@@ -326,7 +326,11 @@ struct Response_Binary : Response
 			if (in.eof()) return;
 			const size_t much((togo>Sz) ? Sz : togo);
 			in.read((char*)buffer, much);
-			if (!in) continue;
+			if (!in) 
+			{
+				Log( "not in failure" );
+				continue;
+			}
 			const int sent(
 				( USE_SSL==1 ) ?  
 					SSL_write(sockt.GetSsl(), buffer, much )
@@ -486,7 +490,7 @@ void* service(void* lk)
 		while (!KILL)
 		{
 
-			{const int T((rand()%100)+1000); usleep(T); }
+			{const int T((rand()%1000)+100000); usleep(T); }
 			int sock(0);
 			{
 				ThreadWidget locker(lock);
@@ -495,8 +499,9 @@ void* service(void* lk)
 
 			if (!sock) 
 			{
-				const int T((rand()%40)+10); 
+				const int T((rand()%400000)+100000); 
 				usleep(T); 
+				//Log( "not sock error" );
 				continue;
 			}
 
@@ -506,7 +511,11 @@ void* service(void* lk)
 
 			SSL_CTX* ctx( create_context( UsingSsl ) );
 
-			if ( ( UsingSsl ) && ( ! ctx ) ) continue;
+			if ( ( UsingSsl ) && ( ! ctx ) ) 
+			{
+				Log( "not ctx error" );
+				continue;
+			}
 
 			STACK_OF(X509_NAME) * x509names( configure_context( ctx ) ); 
 			if ( ( UsingSsl ) && ( x509names == NULL ) ) throw string( "Cannot get x509 names" );
@@ -519,6 +528,8 @@ void* service(void* lk)
 				if (SSL_accept( ssl ) <= 0) 
 				{
 					ERR_print_errors_fp(stderr);
+					Log( "Cannot SSL Accept" );
+					{const int T((rand()%10)+10); usleep(T); }
 					continue;
 				}
 			}
@@ -541,6 +552,7 @@ void* service(void* lk)
 
 			while (true)
 			{
+				{const int T((rand()%10)+10); usleep(T); }
 				string line;
 				ss.getline(line);
 				if (line.empty()) break;
@@ -557,6 +569,8 @@ void* service(void* lk)
                         if ( ipaddr.size() < 1 )
                         {
                                 Log( string("\033[31m") + ss.dotted() + string(" has no : \033[0m") );
+				{const int T((rand()%10)+10); usleep(T); }
+				Log( "ipaddr error" );
                                 continue;
                         }
                         const string addr( ipaddr[ 0 ] );

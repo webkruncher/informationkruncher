@@ -1,0 +1,16 @@
+
+
+for PORT in 80; do
+#PORT=4433
+	pid=`ps aux | grep "infokruncher.${PORT}" | sed '/grep/d' | tr -s ' ' | cut -d ' ' -f2`
+	if [ "${pid}" == "" ]; then
+		echo "not running yet"
+	else
+		echo "killing ${pid}"
+		kill -9 ${pid}			
+		wget -O- localhost:${PORT} 2>&1 >> /dev/null
+	fi
+
+
+
+done
