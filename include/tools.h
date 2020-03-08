@@ -424,6 +424,7 @@ namespace JTools
 	void SignalHandler (int signum)
 	{ 
 		Log("signal handled");
+		sleep( 1 );
 	}
 
 	int SetSignals()
