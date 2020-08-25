@@ -24,12 +24,16 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef KRUNCHERTOOLS
+#define KRUNCHERTOOLS
 #include <sys/stat.h>
 #include <syslog.h>
 #include <oformat.h>
 #include <map>
 #include <sys/signal.h>
 #include <memory>
+#include <vector>
+#include <fstream>
 
 typedef std::string stringtype;
 typedef char chartype;
@@ -40,7 +44,7 @@ extern volatile bool KILL;
 namespace JTools
 {
 	using namespace OFormat;
-	void Log(const string& what) { if (1) syslog(1,what.c_str()); }
+	inline void Log(const string& what) { if (1) syslog(1,what.c_str()); }
 
 
 	struct stringvector : vector<string> 
@@ -134,7 +138,7 @@ namespace JTools
 	inline ostream& operator<<(ostream& o,const icstringvector& m)
 		{ return m.operator<<(o); }
 
-	bool FileExists(const string& filename)
+	inline bool FileExists(const string& filename)
 	{
 		string pathname("text/");
 		pathname+=filename;
@@ -149,7 +153,7 @@ namespace JTools
 		}
 	}
 
-	size_t FileSize(const string& filename)
+	inline size_t FileSize(const string& filename)
 	{
 		string pathname("text/");
 		pathname+=filename;
@@ -166,7 +170,7 @@ namespace JTools
 		}
 	}
 
-	void LoadFile(const string& filename, stringstream& ss)
+	inline void LoadFile(const string& filename, stringstream& ss)
 	{
 		string pathname("text/");
 		pathname+=filename;
@@ -178,7 +182,7 @@ namespace JTools
 		//cout << "\033[32m" << ">" << "\033[0m"; cout.flush();
 	}
 
-	void LoadFile(const string& filename, unsigned char* dest, size_t sz)
+	inline void LoadFile(const string& filename, unsigned char* dest, size_t sz)
 	{
 		string pathname("text/");
 		pathname+=filename;
@@ -238,14 +242,14 @@ namespace JTools
 		unsigned char *chars;
 	};
 
-	string statusText(const int status)
+	inline string statusText(const int status)
 	{
 		if (status == 200) return "OK";
 		if (status == 404) return "Not Found";
 		return "ERROR";
 	}
 
-	string RequestUrl(const char* _line)
+	inline string RequestUrl(const char* _line)
 	{
 		if (!_line) return "";
 		string line(_line);
@@ -258,7 +262,7 @@ namespace JTools
 
 
 
-	string ContentType(const string& _what)
+	inline string ContentType(const string& _what)
 	{
 		icstring what(_what.c_str());
 
@@ -289,7 +293,7 @@ namespace JTools
 		return "text/html; charset=iso-8859-1;";
 	}
 
-	string Abrieviate(const string instr)
+	inline string Abrieviate(const string instr)
 	{
 		size_t m((instr.size()>128)?128:instr.size());
 		return instr.substr(0,m);
@@ -414,20 +418,20 @@ namespace JTools
 	};
 
 
-	void KillSignalHandler (int signum)
+	inline void KillSignalHandler (int signum)
 	{ 
 		Log("Got a Kill signal");
 		KILL=true;
 	}
 
 
-	void SignalHandler (int signum)
+	inline void SignalHandler (int signum)
 	{ 
 		Log("signal handled");
 		sleep( 1 );
 	}
 
-	int SetSignals()
+	inline int SetSignals()
 	{
 		int Sigs[]=
 		{
@@ -480,3 +484,4 @@ namespace JTools
 
 } // JTools
 
+#endif // KRUNCHERTOOLS

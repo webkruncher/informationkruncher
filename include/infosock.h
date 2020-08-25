@@ -283,7 +283,7 @@ namespace InformationSocket
 		} buffer;		
 	};
 
-	void Socket::getline(string& line)
+	inline void Socket::getline(string& line)
 	{
 		stringstream ss;
 		set<char> skips; 

@@ -29,9 +29,11 @@
 #define PRETTY_HEADERS_H
 
 #include <iomanip>
+#include <sstream>
 namespace OFormat
 {
 	using namespace std;
+	inline ostream& omega(ostream& o){o<<"\\234";return o;}
 	inline ostream& wspce(ostream& o){o<<" ";return o;}
 	inline ostream& tab(ostream& o){o<<"\t";return o;}
 	inline ostream& coma(ostream& o){o<<",";return o;}
