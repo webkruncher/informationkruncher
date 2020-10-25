@@ -3,5 +3,5 @@ cmake_minimum_required(VERSION 3.10)
 project("Information Kruncher Custom Web Server")
 
 # executable to compile
-add_executable(informationkruncher "informationkruncher.cpp")
+add_executable(infokruncher "infokruncher.cpp")
 
