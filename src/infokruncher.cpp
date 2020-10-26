@@ -693,7 +693,7 @@ int main(const int argc, const char** argv)
 
 
         if (!ssrvc.listen()) throw "Cannot listen";
-#if 0 // Forking
+#if 1 // Forking
 
         vector<pid_t> children;
 
