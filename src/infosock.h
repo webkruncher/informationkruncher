@@ -335,7 +335,6 @@ namespace InformationSocket
 
 	inline int Timeout(u_long sock,int s,int u)
 	{
-#if 0
 		int ret(1);
 		struct timeval tv;
 		tv.tv_sec = s;
@@ -345,9 +344,6 @@ namespace InformationSocket
 		if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0) 
 			{ret=0; throw string("Cannot set timeout");}
 		return ret;
-#else
-        return 0;
-#endif
 	}
 
 

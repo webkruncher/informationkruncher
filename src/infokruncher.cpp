@@ -552,26 +552,20 @@ void* service(void* lk)
 #else
             Socket ss( sock );
 
-            //{stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
-            //           Log( pidstr.str() + string("From ") + ss.dotted()  );}
+            {stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
+                       Log( pidstr.str() + string("From ") + ss.dotted()  );}
 
 #endif
 
-//Log("Set timeout");
-            ss.timeout(1, 0);
-//Log("Blocking");
- //           ss.blocking(true);
-Log("Headers");
+            ss.timeout(3, 0);
+            ss.blocking(true);
 
             icstringvector headers;
             icstring requestline;
 
-int jj( 0 );
             while (true)
             {
 
-stringstream ssmgs; ssmgs << "Read:" << jj++ ;
-Log( ssmgs.str() );
                 {const int T((rand()%10)+10); usleep(T); }
                 string line;
                 ss.getline(line);
@@ -619,19 +613,18 @@ Log( ssmgs.str() );
                     ss.close();
                     return NULL;
                 }
-                auto_ptr<Response> respond(rq);
+                unique_ptr<Response> respond(rq);
                 Response& response(*respond.get());
                 response();
             } else {
 
-                //RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock) :
-                //Socket& sock(request);
                 ss.flush();
                 stringstream ssf;
                 string srequest( requestline.c_str() );
 
-                string file("/home/jmt/informationkruncher/README.md");
-                const string contenttype(ContentType(srequest));
+                string file("README.md");
+                //const string contenttype(ContentType(srequest));
+                const string contenttype("text/plain");
 
                 LoadFile(file.c_str(), ssf);
                 int status=200;
@@ -648,8 +641,6 @@ Log( ssmgs.str() );
                 ss.write(response.str().c_str(), response.str().size());
                 ss.flush();
                 stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
-
-
             }
 
             ss.close();
@@ -672,12 +663,12 @@ Log( ssmgs.str() );
 int main(const int argc, const char** argv)
 {
     cerr << "Starting infokruncher." << SERVICE_PORT << endl;
-    //	SetSignals();
+    SetSignals();
     CmdLine cmdline(argc, argv);
-    //if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
-    //else cerr << "Loading infokruncher in test mode" << endl;
-    //if (!cmdline.exists("-d")) Daemonizer daemon(argv[0]);
-    //	SetSignals();
+    if (!cmdline.exists("-d")) cerr << "Daemonizing infokruncher" << endl;
+    else cerr << "Loading infokruncher in test mode" << endl;
+    if (!cmdline.exists("-d")) Daemonizer daemon(argv[0]);
+    SetSignals();
     srand(time(0));
     stringstream ssexcept;
     try
