@@ -97,6 +97,7 @@ namespace InformationSocket
 		virtual int sync(){if (Flush()==EOF) return -1;			return 0;}
 		virtual int read(char* destination,size_t byts)
 		{
+#ifdef USE_SSL
 			if ( ssl )
 			{
 				const int ret(SSL_read(ssl, destination, byts )); 
@@ -105,6 +106,10 @@ namespace InformationSocket
 				const int ret(recv(sock, destination, byts, 0));
 				return ret;
 			}
+#else
+            const int ret(recv(sock, destination, byts, 0));
+            return ret;
+#endif
 		}
 		virtual SSL* GetSsl(){return ssl;}
 
@@ -123,6 +128,7 @@ namespace InformationSocket
 	protected:
 		virtual int write(const char* source,size_t byts)
 		{ 
+#ifdef USE_SSL
 			if ( ssl )
 			{
 				const int ret(SSL_write(ssl, source, byts )); 
@@ -131,6 +137,10 @@ namespace InformationSocket
 				const int ret(send(sock, source, byts, 0)); 
 				return ret;
 			}
+#else
+            const int ret(send(sock, source, byts, 0)); 
+            return ret;
+#endif
 		}
 		virtual void throttle () = 0;
 		int sock;

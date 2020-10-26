@@ -42,6 +42,7 @@
 #include <sstream>
 #include <memory>
 #include <set>
+#include <signal.h>
 
 #define KRUNCH_PERMIT_IP 0X10
 
@@ -112,7 +113,10 @@ namespace InformationSocket
 		SocketType& D;
 	protected:
 		virtual int write(const char* source,size_t byts)
-			{ const int ret(send(sock, source, byts, 0)); }
+        { 
+            const int ret(send(sock, source, byts, 0)); 
+            return ret;
+        }
 		virtual void throttle () = 0;
 		int sock;
 		int buffersize;
@@ -264,6 +268,7 @@ namespace InformationSocket
 		{ 
 			streamingsocket::blocking(b); 
 			buffer.blocking(b);
+            return b;
 		}
 		protected:
 		struct  StreamBuffer : public SocketBuffer  <StreamBuffer>
@@ -327,9 +332,10 @@ namespace InformationSocket
 		return ::accept(sock,(struct sockaddr *) &client,(socklen_t*)&addrlen);
 	}
 
-#if 0
+
 	inline int Timeout(u_long sock,int s,int u)
 	{
+#if 0
 		int ret(1);
 		struct timeval tv;
 		tv.tv_sec = s;
@@ -339,22 +345,12 @@ namespace InformationSocket
 		if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0) 
 			{ret=0; throw string("Cannot set timeout");}
 		return ret;
-	}
+#else
+        return 0;
 #endif
+	}
 
-    inline int Timeout(u_long sock,int s,int u)
-    {
-return 1;
-        int ret(1);
-        struct timeval tv;
-        tv.tv_sec = s;
-        tv.tv_usec = u;
-        if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set send timeout") << endl;}
-        if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set recieve timeout") << endl;}
-        return ret;
-    }
+
 
 
 
