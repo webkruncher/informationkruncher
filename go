@@ -1,15 +1,6 @@
 
-#pkill tail
 
-	#touch src/*
-#	pid=`ps aux | grep "infokruncher" | sed '/grep/d' | sed '/vim/d' | tr -s ' ' | cut -d ' ' -f2`
-#	if [ "${pid}" == "" ]; then
-#		echo -ne "\033[33mnot running yet\033[0m\n"
-#	else
-#		echo -ne "\033[31mkilling ${pid}\033[0m\n"
-#		kill -9 ${pid}			
-#		wget -O- localhost 2>&1 >> /dev/null
-#	fi
+
 
     ./stop
 
@@ -25,7 +16,7 @@
 
 
 
-	if [ 1 == 1 ]; then
+	if [ 0 == 1 ]; then
 		./src.build/infokruncher -d
 	else
 		if [ -f ./src.build/infokruncher ] ; then

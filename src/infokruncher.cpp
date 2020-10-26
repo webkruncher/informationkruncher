@@ -190,7 +190,6 @@ struct Response_Home : Response
     Response_Home(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
     virtual void operator ()()
     {
-return ;
         Socket& sock(request);
         sock.flush();
         stringstream ss;
@@ -411,8 +410,8 @@ struct Response_Page : Response
 
 struct RequestManager : Request
 {
-    RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock, unique_ptr<Response>& _respond ) :
-        Request(_request, _headers, _sock, _respond ) {}
+    RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
+        Request(_request, _headers, _sock ) {}
 
     operator Response& ()
     {
@@ -422,10 +421,20 @@ struct RequestManager : Request
         if (  response.get() ) return *response.get(); 
         //if (request.find("GET /src ")==0) return new Response_SrcSys(*this, tbd, status);
         if (request.find("/?ping ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Ping(*this, tbd, status) ); 
+
         if (request.find("GET / ")==0) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Home(*this, tbd, status) );
+        if ( response.get() ) { Log("Home page"); return *response.get(); }
+
         if (tbd.empty()) if ( ! response.get() ) response=unique_ptr<Response>( new Response_NotFound(*this, status) );
+        if ( response.get() ) { Log("Not Found Page"); return *response.get(); }
+
+
         if ( ! response.get() ) response=unique_ptr<Response>( new Response_Page(*this, tbd, status) );
+        if ( response.get() ) { Log("Response Page"); return *response.get(); }
+
         response=unique_ptr<Response>( new Response_NotFound(*this, status) );
+        if ( response.get() ) { Log("Not Found Page 2"); return *response.get(); }
+
         if ( ! response.get() ) throw string( "Can't get response" );
         return *response.get(); 
     }
@@ -603,17 +612,16 @@ void* service(void* lk)
 
             if ( true )
             {
-                unique_ptr<Response> respond;
-                //RequestManager request(requestline, headers, ss, respond);
-                //if (!request.resolve()) 
+                RequestManager request(requestline, headers, ss );
+                if (!request.resolve()) 
                 {
-                    //ss.close();
-                    //return NULL;
+                    ss.close();
+                    return NULL;
                 }
 
-                //Response& rq(request);
-                //rq();
-
+                Response& rq(request);
+                rq();
+#if 0
                 ss.flush();
                 stringstream ssf;
                 string srequest( requestline.c_str() );
@@ -637,6 +645,7 @@ void* service(void* lk)
                 ss.write(response.str().c_str(), response.str().size());
                 ss.flush();
                 stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
+#endif
             }
 
             ss.close();

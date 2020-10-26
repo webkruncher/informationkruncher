@@ -29,16 +29,19 @@
 
 namespace Hyper
 { 
-	struct Response : oformat
+	struct Response 
 	{
-		Response() : oformat(cerr) {}
-		virtual void operator ()() = 0;
+		virtual void operator ()() 
+        {
+            Log("Default Response::operator()()");
+        }
 	};
 
-	struct Request : oformat
+	struct Request 
 	{
-		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock, unique_ptr<Response>& _response ) :
-			request(_request), headers(_headers), sock(_sock), response( _response ) {}
+		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
+			request(_request), headers(_headers), sock(_sock) {}
+        //virtual ~Request() { response.release(); } 
 		const char* c_str() const {return request.c_str();}
 		operator Socket& () const {return sock;}
 		string Host() const { return host; }
@@ -85,7 +88,7 @@ namespace Hyper
 		const icstring& request;
 		const icstringvector& headers;
         Socket& sock;
-        unique_ptr<Response>& response;
+        unique_ptr<Response> response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};
 } // Hyper
