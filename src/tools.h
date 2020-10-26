@@ -28,7 +28,7 @@
 #define KRUNCHERTOOLS
 #include <sys/stat.h>
 #include <syslog.h>
-#include <oformat.h>
+#include "oformat.h"
 #include <map>
 #include <sys/signal.h>
 #include <memory>
@@ -44,7 +44,7 @@ extern volatile bool KILL;
 namespace JTools
 {
 	using namespace OFormat;
-	inline void Log(const string& what) { if (1) syslog(1,what.c_str()); }
+	inline void Log(const string& what) { if (1) syslog(1,"%s",what.c_str()); }
 
 
 	struct stringvector : vector<string> 
@@ -290,6 +290,9 @@ namespace JTools
 		if (what.find(".xml ")!=string::npos) 
 			return "text/xml";
 
+		if (what.find(".md ")!=string::npos) 
+			return "text/plain";
+
 		return "text/html; charset=iso-8859-1;";
 	}
 
@@ -478,6 +481,7 @@ namespace JTools
 
 		if (signal (SIGTERM, KillSignalHandler) == SIG_IGN)
 			signal (SIGTERM, SIG_IGN);
+        return 0;
 	}
 
 

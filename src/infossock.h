@@ -25,8 +25,8 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef INFOSOCKS_H
-#define INFOSOCKS_H
+#ifndef INFOSSOCKS_H
+#define INFOSSOCKS_H
 
 #include <stdio.h>
 #include <string.h>
@@ -43,6 +43,9 @@
 #include <memory>
 #include <set>
 
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
 #define KRUNCH_PERMIT_IP 0X10
 
 namespace InformationSocket
@@ -58,7 +61,7 @@ namespace InformationSocket
 	template <class SocketType>
 		struct SocketBuffer : protected streambuf
 	{
-		SocketBuffer(SocketType& st) : D(st),buffersize(BufferSize), outb(NULL),inb(NULL), streambuf(),sock(0), much(0)
+		SocketBuffer(SocketType& st, SSL* _ssl=NULL) : D(st),buffersize(BufferSize), outb(NULL),inb(NULL), streambuf(),sock(0), much(0), ssl( _ssl )
 		{
 			inb=(char*)malloc(buffersize+6);setg(inb+4,inb+4,inb+4);
 			outb=(char*)malloc(buffersize+6);setp(outb,outb+(buffersize-1));
@@ -94,9 +97,21 @@ namespace InformationSocket
 		virtual int sync(){if (Flush()==EOF) return -1;			return 0;}
 		virtual int read(char* destination,size_t byts)
 		{
-			const int ret(recv(sock, destination, byts, 0));
-			return ret;
+#ifdef USE_SSL
+			if ( ssl )
+			{
+				const int ret(SSL_read(ssl, destination, byts )); 
+				return ret;
+			} else {	
+				const int ret(recv(sock, destination, byts, 0));
+				return ret;
+			}
+#else
+            const int ret(recv(sock, destination, byts, 0));
+            return ret;
+#endif
 		}
+		virtual SSL* GetSsl(){return ssl;}
 
 	private:
 		virtual void close() = 0;
@@ -112,12 +127,27 @@ namespace InformationSocket
 		SocketType& D;
 	protected:
 		virtual int write(const char* source,size_t byts)
-			{ const int ret(send(sock, source, byts, 0)); }
+		{ 
+#ifdef USE_SSL
+			if ( ssl )
+			{
+				const int ret(SSL_write(ssl, source, byts )); 
+				return ret;
+			} else {	
+				const int ret(send(sock, source, byts, 0)); 
+				return ret;
+			}
+#else
+            const int ret(send(sock, source, byts, 0)); 
+            return ret;
+#endif
+		}
 		virtual void throttle () = 0;
 		int sock;
 		int buffersize;
 		char* inb,*outb;
 		bool Blocking;
+		SSL* ssl;
 	};
 
 	class streamingsocket
@@ -222,6 +252,11 @@ namespace InformationSocket
 		{
 			buffer=sock;SetSock(sock);
 		}
+		Socket(int sock, SSL* _ssl ) : auth( 0 ), buffer(*this, _ssl), streamingsocket((char*)"",0), 
+			iostream((streambuf*)&buffer)
+		{
+			buffer=sock;SetSock(sock);
+		}
 		Socket(int sock,int buffersize) : auth( 0 ), buffer(*this,buffersize), 
 			streamingsocket((char*)"",0), iostream((streambuf*)&buffer)
 		{
@@ -244,6 +279,7 @@ namespace InformationSocket
 			buffer.much=0; buffer.bread=0; 
 		}
 		virtual ~Socket() { }
+		virtual SSL* GetSsl(){return buffer.GetSsl();}
 		void getline(string& line);
 		virtual int write(const char* source,long byts)
 		{
@@ -270,7 +306,7 @@ namespace InformationSocket
 		{
 			friend class Socket;
 			private:
-			StreamBuffer(Socket& _linkage) : linkage(_linkage) ,SocketBuffer<StreamBuffer>(thing),much(0),bread(0) {}
+			StreamBuffer(Socket& _linkage, SSL* _ssl=NULL) : linkage(_linkage) ,SocketBuffer<StreamBuffer>(thing, _ssl),much(0),bread(0) {}
 			StreamBuffer(Socket& _linkage,int bsize) :much(0),bread(0),
 			SocketBuffer<StreamBuffer>(thing,bsize),linkage(_linkage) {}
 			virtual void close() {linkage.close();}
@@ -283,13 +319,14 @@ namespace InformationSocket
 		} buffer;		
 	};
 
-	inline void Socket::getline(string& line)
+	void Socket::getline(string& line)
 	{
 		stringstream ss;
 		set<char> skips; 
 		skips.insert('\r');
 		while (true)
 		{
+//cerr << "G";
 			int c(get());
 			if (skips.find(c)!=skips.end())
 				{ skips.erase(c); continue; }
@@ -350,19 +387,108 @@ return 1;
         tv.tv_sec = s;
         tv.tv_usec = u;
         if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set send timeout") << endl;}
+            {ret=0; cerr<< ("Can't set send timeout") << endl;}
         if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0)
-            {ret=0; cout<< ("Can't set recieve timeout") << endl;}
+            {ret=0; cerr<< ("Can't set recieve timeout") << endl;}
         return ret;
     }
 
 
 
+	inline void init_openssl()
+	{ 
+		SSL_library_init();
+		SSL_load_error_strings();	
+		OpenSSL_add_ssl_algorithms();
+	}
+
+	inline void cleanup_openssl()
+	{
+		EVP_cleanup();
+	}
+
+	inline SSL_CTX *create_context( const bool UsingSsl = false )
+	{
+		if ( ! UsingSsl ) return NULL;
+		const SSL_METHOD *method;
+		SSL_CTX *ctx;
+
+		method = SSLv23_server_method();
+
+		ctx = SSL_CTX_new( method );
+
+		if (!ctx)
+		{
+			ERR_print_errors_fp(stderr);
+			throw string( "Cannot create SSL context" );
+		}
+
+		return ctx;
+	}
+
+
+
+
+
+
+	inline STACK_OF(X509_NAME) * configure_context(SSL_CTX *ctx)
+	{
+		if ( ! ctx ) return NULL;
+		SSL_CTX_set_ecdh_auto(ctx, 1);
+
+		if (SSL_CTX_use_certificate_file(ctx, CERT_FILE, SSL_FILETYPE_PEM) <= 0) {
+			ERR_print_errors_fp(stderr);
+			exit(EXIT_FAILURE);
+		}
+
+		SSL_CTX_set_default_passwd_cb_userdata(ctx,( char* ) KEY_PASSWD);
+
+		if (SSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM) <= 0 ) {
+			ERR_print_errors_fp(stderr);
+			exit(EXIT_FAILURE);
+		}
+
+
+		if (SSL_CTX_check_private_key(ctx) == 0) {
+			printf("Private key does not match the certificate public key\n");
+			exit(0);
+		}
+
+
+		//SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,NULL);
+
+
+		if (SSL_CTX_load_verify_locations(ctx,CA_FILE,CA_DIR)<1) {
+			printf("Error setting the verify locations.\n");
+			exit(0);
+		}
+
+		return SSL_load_client_CA_file(CA_FILE);
+	}
+
+	struct SslContext
+	{
+		SslContext( SSL_CTX* _ctx, SSL* _ssl, Socket& _sck ) :
+			ctx( _ctx ), ssl( _ssl ), sck( _sck ) {}
+		~SslContext()
+		{
+			//cerr << "~"; cerr.flush();
+			if ( ! ctx ) return; 
+			SSL_free(ssl);
+			sck.close();
+			SSL_CTX_free( ctx );
+		}
+		private:
+		SSL_CTX* ctx;
+		SSL* ssl;
+		Socket& sck;
+	};
 
 } // InformationSocket
 
-#endif //INFOSOCKS_H
+#endif //INFOSSOCKS_H
 // WebKruncher.com
+
 
 
 
