@@ -37,8 +37,8 @@ namespace Hyper
 
 	struct Request : oformat
 	{
-		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock) :
-			request(_request), headers(_headers), sock(_sock) {}
+		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock, unique_ptr<Response>& _response ) :
+			request(_request), headers(_headers), sock(_sock), response( _response ) {}
 		const char* c_str() const {return request.c_str();}
 		operator Socket& () const {return sock;}
 		string Host() const { return host; }
@@ -62,7 +62,12 @@ namespace Hyper
 			}
 			return true;
 		}
-		string host; Socket& sock;
+		string host; 
+        virtual operator Response& () 
+        { 
+            if ( ! response.get() ) throw string( "Can't get response" );
+            return *response.get(); 
+        }
 		protected:
 		string mimevalue(string line)
 		{
@@ -79,6 +84,8 @@ namespace Hyper
 
 		const icstring& request;
 		const icstringvector& headers;
+        Socket& sock;
+        unique_ptr<Response>& response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};
 } // Hyper

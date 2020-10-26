@@ -190,6 +190,7 @@ struct Response_Home : Response
     Response_Home(Request& _request, const string _tbd, int& _status) : request(_request), tbd(_tbd), status(_status) {}
     virtual void operator ()()
     {
+return ;
         Socket& sock(request);
         sock.flush();
         stringstream ss;
@@ -410,30 +411,34 @@ struct Response_Page : Response
 
 struct RequestManager : Request
 {
-    RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock) :
-        Request(_request, _headers, _sock) {}
-    operator Response* ()
+    RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock, unique_ptr<Response>& _respond ) :
+        Request(_request, _headers, _sock, _respond ) {}
+
+    operator Response& ()
     {
-        Response* ret(NULL);
+        if (  response.get() ) return *response.get(); 
         const string tbd(Tbd(request, *this));
-        ret=ifBinary(tbd);
-        if (ret) return ret;
+        ifBinary(tbd);
+        if (  response.get() ) return *response.get(); 
         //if (request.find("GET /src ")==0) return new Response_SrcSys(*this, tbd, status);
-        if (request.find("/?ping ")!=string::npos) return new Response_Ping(*this, tbd, status);
-        if (request.find("GET / ")==0) return new Response_Home(*this, tbd, status);
-        if (tbd.empty()) return new Response_NotFound(*this, status);
-        else return new Response_Page(*this, tbd, status);
-        return new Response_NotFound(*this, status);
+        if (request.find("/?ping ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Ping(*this, tbd, status) ); 
+        if (request.find("GET / ")==0) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Home(*this, tbd, status) );
+        if (tbd.empty()) if ( ! response.get() ) response=unique_ptr<Response>( new Response_NotFound(*this, status) );
+        if ( ! response.get() ) response=unique_ptr<Response>( new Response_Page(*this, tbd, status) );
+        response=unique_ptr<Response>( new Response_NotFound(*this, status) );
+        if ( ! response.get() ) throw string( "Can't get response" );
+        return *response.get(); 
     }
+
     private:
     Response* ifBinary(const string tbd)
     {
         if (request.find("GET /")==0) 
         {
-            if (request.find(".ico ")!=string::npos) return new Response_Binary(*this, tbd, status);
-            if (request.find(".png ")!=string::npos) return new Response_Binary(*this, tbd, status);
-            if (request.find(".jpg ")!=string::npos) return new Response_Binary(*this, tbd, status);
-            if (request.find(".gif ")!=string::npos) return new Response_Binary(*this, tbd, status);
+            if (request.find(".ico ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>(new Response_Binary(*this, tbd, status));
+            if (request.find(".png ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>(new Response_Binary(*this, tbd, status));
+            if (request.find(".jpg ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>(new Response_Binary(*this, tbd, status));
+            if (request.find(".gif ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>(new Response_Binary(*this, tbd, status));
         }
         return NULL;
     }
@@ -565,7 +570,6 @@ void* service(void* lk)
 
             while (true)
             {
-
                 {const int T((rand()%10)+10); usleep(T); }
                 string line;
                 ss.getline(line);
@@ -597,26 +601,18 @@ void* service(void* lk)
                 stringstream ssout; ssout << fence << "[OTHERIP]" << fence << addr << fence; Log (ssout.str()); 
             }
 
-
-            if ( false )
+            if ( true )
             {
-                RequestManager request(requestline, headers, ss);
-                if (!request.resolve()) 
+                unique_ptr<Response> respond;
+                //RequestManager request(requestline, headers, ss, respond);
+                //if (!request.resolve()) 
                 {
-                    ss.close();
-                    return NULL;
+                    //ss.close();
+                    //return NULL;
                 }
 
-                Response* rq(request);
-                if (!rq) 
-                {
-                    ss.close();
-                    return NULL;
-                }
-                unique_ptr<Response> respond(rq);
-                Response& response(*respond.get());
-                response();
-            } else {
+                //Response& rq(request);
+                //rq();
 
                 ss.flush();
                 stringstream ssf;
