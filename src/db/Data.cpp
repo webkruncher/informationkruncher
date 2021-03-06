@@ -75,7 +75,6 @@ namespace XmlPayload
 		virtual XmlNodeBase* NewNode(Xml& _doc,XmlNodeBase* parent,stringtype name) 
 		{ 
 			XmlNodeBase* ret(NULL);
-			cerr << "\33[33m" << name << "\33[30m" << "|";
 			ret=new Item(_doc,parent,name); 
 			return ret;
 		}
@@ -240,9 +239,6 @@ void* service(void* lk)
                 continue;
             }
 
-Log( "Got a data request" );
-
-            //cerr << "Serving: " << ( UsingSsl ? "SSL" : "PLAINTEXT" ) << endl; cerr.flush();
             Socket ss( sock );
 
             {stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
