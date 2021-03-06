@@ -21,7 +21,7 @@
 			./src.build/db/kruncherdb& 
 
 
-			[ -f /var/log/syslog ] && sudo tail -f /var/log/syslog | grep -i --line-buffered "jmt" | grep "favicon.ico" | cut -d: -f4-20&
+			#[ -f /var/log/syslog ] && sudo tail -f /var/log/syslog | grep -i --line-buffered "jmt" | grep "favicon.ico" | cut -d: -f4-20&
 
 		else
 			echo -ne "\033[31mBuild failed\033[0m\n"

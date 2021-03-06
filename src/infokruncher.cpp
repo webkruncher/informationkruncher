@@ -66,65 +66,9 @@ using namespace Hyper;
 volatile bool KILL(false);
 
 #include <signal.h>
+#include "DataBase.h"
 
-void GetData()
-{
-	stringstream ssdb, ssxml;
-	ssxml << "<data><get>home</get></data>";
-	ssdb << "HTTP/1.1 GET /data" << endl;
-	ssdb << "Content-length: " << ssxml.str().size() << endl << endl;
-	ssdb << ssxml.str() << endl;
-	Log(NoBreaks(ssdb.str()));
-	Socket db( (char*) "127.0.0.1", 99 );
-	if ( db.open() && db.connect() )
-	{
-		db.timeout(1, 00);
-		db.blocking(true);
-		db.write( ssdb.str().c_str(), ssdb.str().size() );
-		db.flush();
-		string dbreqponseline;
-		stringstream dbresponse;
-		
-		icstringvector dbheaders;
-		while ( true ) 
-		{
-			stringtype line;
-			db.getline( line );
-			if ( line.empty() ) break;
-			if ( dbreqponseline.empty() )
-			{
-				dbreqponseline=line;
-			} else {
-				dbheaders.push_back( line );
-			}
-		}
-		string sdbcl;
-		for (icstringvector::const_iterator it=dbheaders.begin();it!=dbheaders.end();it++)
-		{
-			icstring line(*it);
-			if (line.find("content-length:")!=string::npos) sdbcl=mimevalue(line.c_str());
-		}
-		const int Len( atoi( sdbcl.c_str() ) );
-		if ( ( sdbcl.empty() ) || ( Len>1024 ) )
-		{ 
-			stringstream ssout; ssout << fence << "[DATARESPONSE-INVALIDSIZE]" << fence << dbresponse.str()<< fence;
-			Log(ssout.str());
-			db.flush(); 
-			return ;
-		} 
 
-		char buf[ Len +1 ];
-		memset( buf, 0, Len+ 1 );
-		db.read( buf, Len );
-		stringtype S( buf );
-		stringstream ssout; ssout << fence << "[DATASPONSE]" << fence << S << fence; Log( ssout.str() ); 
-		
-	} else {
-		stringstream ssout; ssout << fence << "[DATA-UNAVAILABLE]" << fence ;
-		Log(ssout.str());
-	}
-	
-}
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
 {
@@ -153,18 +97,18 @@ string Target(const string& who, const string& _what, const string dflt="/index.
     if (FileExists(maybe.c_str())) 
     {
         ssout << aglin << maybe << aglout << fence;
-        Log(ssout.str());
+        //Log(ssout.str());
         return maybe;
     }
     ssout << brktin << url << brktout << fence ;
-    Log(ssout.str());
+    //Log(ssout.str());
     return url;
 }
 
 string Example(const icstring& request, const Request& req)
 {
     string srequest(request.c_str());
-    stringstream ssout; ssout << fence << "[EXAMPLE]" << fence << request << fence ; Log(ssout.str());
+    //stringstream ssout; ssout << fence << "[EXAMPLE]" << fence << request << fence ; Log(ssout.str());
     const string target(Target("Example", RequestUrl(request.c_str())));
     return target;
 }
@@ -174,7 +118,8 @@ string Example(const icstring& request, const Request& req)
 string Tbd(const icstring& request, const Request& req)
 {
     const icstring host(req.Host().c_str());
-    {stringstream ssout; ssout << fence << "[TBD]" << fence << host << fence << request.c_str() << fence ; Log(ssout.str());}
+    //{stringstream ssout; ssout << fence << "[TBD]" << fence << host << fence << request.c_str() << fence ; Log(ssout.str());}
+
 
     const string target(Target("WebKruncher.text", RequestUrl(request.c_str())));
     return target;
@@ -192,7 +137,7 @@ string Tbd(const icstring& request, const Request& req)
     {
         if (request.find("get / ") == 0 )
         {
-            stringstream ssout; ssout << fence << "[SomethingElse]" << fence << request << fence ; Log(ssout.str());
+            //stringstream ssout; ssout << fence << "[SomethingElse]" << fence << request << fence ; Log(ssout.str());
             return "WebKruncher.text/wip.html";
         }
         return Example(request, req);
@@ -213,7 +158,7 @@ struct Response_NotFound : Response
         stringstream ss;
 
         string srequest(request.c_str());
-        Log(NoBreaks(srequest));
+        //Log(NoBreaks(srequest));
 
         string file("notfound.html");
         string contenttype("text/html");
@@ -234,7 +179,7 @@ struct Response_NotFound : Response
 
         sock.write(response.str().c_str(), response.str().size());
         sock.flush();
-        stringstream ssout; ssout << fence << "[NOTFOUND]" << fence << file << fence << request.c_str() << fence << request.Headers();  Log(ssout.str());
+        //stringstream ssout; ssout << fence << "[NOTFOUND]" << fence << file << fence << request.c_str() << fence << request.Headers();  Log(ssout.str());
     }
     protected:
     Request& request;
@@ -256,7 +201,6 @@ struct Response_Home : Response
         string file(tbd.c_str());
         const string contenttype(ContentType(srequest));
 
-	GetData();
 	
 
         LoadFile(file.c_str(), ss);
@@ -273,7 +217,7 @@ struct Response_Home : Response
         response << ss.str();
         sock.write(response.str().c_str(), response.str().size());
         sock.flush();
-        stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
+        //stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
     }
     protected:
     const string tbd;
@@ -394,7 +338,7 @@ struct Response_Binary : Response
             in.read((char*)buffer, much);
             if (!in) 
             {
-                Log( "not in failure" );
+                //Log( "not in failure" );
                 continue;
             }
 #ifdef USE_SSL
@@ -432,7 +376,7 @@ struct Response_Page : Response
         string srequest(request.c_str());
         string file(tbd.c_str());
         string contenttype(ContentType(srequest));
-        {stringstream ssout; ssout << fence << "[PAGE]" << fence << contenttype << fence << tbd << fence; Log(ssout.str());}
+        //{stringstream ssout; ssout << fence << "[PAGE]" << fence << contenttype << fence << tbd << fence; Log(ssout.str());}
         status=200;
         if (FileExists(file.c_str())) 
         {
@@ -478,23 +422,27 @@ struct RequestManager : Request
     {
         if (  response.get() ) return *response.get(); 
         const string tbd(Tbd(request, *this));
+
+	KrunchData::DataBase db;
+	string data( db );
+
         ifBinary(tbd);
         if (  response.get() ) return *response.get(); 
         //if (request.find("GET /src ")==0) return new Response_SrcSys(*this, tbd, status);
         if (request.find("/?ping ")!=string::npos) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Ping(*this, tbd, status) ); 
 
         if (request.find("GET / ")==0) if ( ! response.get() ) response=unique_ptr<Response>( new Response_Home(*this, tbd, status) );
-        if ( response.get() ) { Log("Home page"); return *response.get(); }
+        if ( response.get() ) { return *response.get(); }
 
         if (tbd.empty()) if ( ! response.get() ) response=unique_ptr<Response>( new Response_NotFound(*this, status) );
-        if ( response.get() ) { Log("Not Found Page"); return *response.get(); }
+        if ( response.get() ) { return *response.get(); }
 
 
         if ( ! response.get() ) response=unique_ptr<Response>( new Response_Page(*this, tbd, status) );
-        if ( response.get() ) { Log("Response Page"); return *response.get(); }
+        if ( response.get() ) { return *response.get(); }
 
         response=unique_ptr<Response>( new Response_NotFound(*this, status) );
-        if ( response.get() ) { Log("Not Found Page 2"); return *response.get(); }
+        if ( response.get() ) { return *response.get(); }
 
         if ( ! response.get() ) throw string( "Can't get response" );
         return *response.get(); 
@@ -595,7 +543,7 @@ void* service(void* lk)
 
             if ( ( UsingSsl ) && ( ! ctx ) ) 
             {
-                Log( "not ctx error" );
+                //Log( "not ctx error" );
                 continue;
             }
 
@@ -611,7 +559,7 @@ void* service(void* lk)
                 if (SSL_accept( ssl ) <= 0) 
                 {
                     ERR_print_errors_fp(stderr);
-                    Log( "Cannot SSL Accept" );
+                    //Log( "Cannot SSL Accept" );
                     {const int T((rand()%10)+10); usleep(T); }
                     continue;
                 }
@@ -623,12 +571,12 @@ void* service(void* lk)
             SslContext sslcontext( ctx, ssl, ss );
             const string sslmsg( ( UsingSsl )  ? " USING SSL" : " USING PLAIN TEXT" );
             stringstream pidstr; pidstr<<"PID " << getpid() << " ";
-            Log( pidstr.str() + string("From ") + ss.dotted()  +  sslmsg );
+            //Log( pidstr.str() + string("From ") + ss.dotted()  +  sslmsg );
 #else
             Socket ss( sock );
 
-            {stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
-                       Log( pidstr.str() + string("From ") + ss.dotted()  );}
+            //{stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
+             //          Log( pidstr.str() + string("From ") + ss.dotted()  );}
 
 #endif
 
@@ -650,25 +598,25 @@ void* service(void* lk)
 
 
 
-            Log( string("Splitting ") + ss.dotted() );
+            //Log( string("Splitting ") + ss.dotted() );
             stringvector ipaddr;
             ipaddr.split( ss.dotted(), ":" );
-            Log( string("Checking ") + ss.dotted() );
+            //Log( string("Checking ") + ss.dotted() );
             if ( ipaddr.size() < 1 )
             {
-                Log( string("\033[31m") + ss.dotted() + string(" has no : \033[0m") );
+                //Log( string("\033[31m") + ss.dotted() + string(" has no : \033[0m") );
                 {const int T((rand()%10)+10); usleep(T); }
-                Log( "ipaddr error" );
+                //Log( "ipaddr error" );
                 continue;
             }
             const string addr( ipaddr[ 0 ] );
 
             if ( PermissionedIps( addr ) )
             {
-                stringstream ssout; ssout << fence << "[PERMISSIONEDIP]" << fence << addr << fence; Log (ssout.str());
+                //stringstream ssout; ssout << fence << "[PERMISSIONEDIP]" << fence << addr << fence; Log (ssout.str());
                 ss.auth|=KRUNCH_PERMIT_IP;
             } else {
-                stringstream ssout; ssout << fence << "[OTHERIP]" << fence << addr << fence; Log (ssout.str()); 
+                //stringstream ssout; ssout << fence << "[OTHERIP]" << fence << addr << fence; Log (ssout.str()); 
             }
 
             if ( true )
@@ -705,7 +653,7 @@ void* service(void* lk)
                 response << ssf.str();
                 ss.write(response.str().c_str(), response.str().size());
                 ss.flush();
-                stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
+                //stringstream ssout; ssout << fence << "[HOME]" << fence << file << fence << contenttype << fence; Log(ssout.str());
 #endif
             }
 
@@ -760,7 +708,7 @@ int main(const int argc, const char** argv)
 
         while ( children.size() < 16 )
         {
-            Log( "Spawn" );
+            //Log( "Spawn" );
             const pid_t newfork( fork() );
             if ( newfork == 0 )
             {
@@ -781,14 +729,14 @@ int main(const int argc, const char** argv)
                     {const int T((rand()%10)+20); usleep(T); }
                 }
 
-                Log("joining");
+                //Log("joining");
 
                 for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
                 {
                     pthread_t t(*it);
                     pthread_join(t, 0);
                 }
-                Log("exiting");
+                //Log("exiting");
             }  else {
                 children.push_back( newfork );
             }
@@ -802,7 +750,7 @@ int main(const int argc, const char** argv)
 
         for ( vector<pid_t>::iterator pit=children.begin();pit!=children.end();pit++)
         {
-            Log( "Parent killing child" );
+            //Log( "Parent killing child" );
             kill(*pit, SIGKILL);
         }
 #else // Not forking
@@ -824,7 +772,7 @@ int main(const int argc, const char** argv)
                     {const int T((rand()%10)+20); usleep(T); }
                 }
 
-                Log("joining");
+                //Log("joining");
 
                 for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
                 {
@@ -838,7 +786,7 @@ int main(const int argc, const char** argv)
         }
 
 #endif
-        Log( "Parent done" );
+        //Log( "Parent done" );
 #ifdef USE_SSL
         cleanup_openssl();
 #endif

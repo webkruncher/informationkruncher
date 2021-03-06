@@ -65,48 +65,11 @@ typedef string stringtype;
 typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
+#include "DataKruncher.h"
 
-namespace XmlPayload
+struct Response_DB : Response
 {
-	using namespace XmlFamily;
-	struct Item : XmlNode
-	{
-		friend struct Payload;
-		virtual XmlNodeBase* NewNode(Xml& _doc,XmlNodeBase* parent,stringtype name) 
-		{ 
-			XmlNodeBase* ret(NULL);
-			ret=new Item(_doc,parent,name); 
-			return ret;
-		}
-		virtual ostream& operator<<(ostream& o) 
-		{ 
-			Log ( name );
-			if ( name == "get" )
-			{
-				o << "<got>dbvalue</got>";
-			} else {
-				XmlNode::operator<<(o); 
-			}
-			return o;
-		}
-		virtual bool operator()(ostream& o) { return XmlNode::operator()(o); }
-		Item(Xml& _doc,const XmlNodeBase* _parent,stringtype _name) : XmlNode(_doc,_parent,_name) {}
-	};
-	inline ostream& operator<<(ostream& o,Item& xmlnode){return xmlnode.operator<<(o);}
-
-	struct Payload : Xml
-	{
-		Payload(){} 
-		virtual XmlNode* NewNode(Xml& _doc,stringtype name) { return new Item(_doc,NULL,name); }
-		ostream& operator<<(ostream& o) { Xml::operator<<(o); return o;}
-		operator Item& () { if (!Root) throw string("No root node"); return static_cast<Item&>(*Root); }
-	};
-	inline ostream& operator<<(ostream& o,Payload& xml){return xml.operator<<(o);}
-
-} // XmlPayload
-struct Response_NotFound : Response
-{
-    Response_NotFound(Request& _request, int& _status) : request(_request), status(_status) {}
+    Response_DB(Request& _request, int& _status) : request(_request), status(_status) {}
     virtual void operator ()()
     {
         Socket& sock(request);
@@ -114,7 +77,7 @@ struct Response_NotFound : Response
         stringstream ss;
 
         string srequest(request.c_str());
-        Log(NoBreaks(srequest));
+        //Log(NoBreaks(srequest));
 
         string contenttype("text/xml");
 
@@ -132,7 +95,7 @@ struct Response_NotFound : Response
 	sock.read( buf, Len );
 	stringtype S( buf );
 
-	XmlPayload::Payload config;
+	DataKruncher::Payload config;
 	config.Load(S, NULL);
 	config.TabLevel(0);
 	ss<<config;
@@ -153,8 +116,8 @@ struct Response_NotFound : Response
 
         sock.write(response.str().c_str(), response.str().size());
         sock.flush();
-        {stringstream ssout; ssout << fence << "[DATAREQUEST]" << fence << request.c_str() << fence << request.Headers() << fence << S << fence << sLen << fence;  Log(ssout.str());}
-        {stringstream ssout; ssout << fence << "[DATARESPONDED]" << fence << NoBreaks(response.str()) << fence;  Log(ssout.str());}
+        //{stringstream ssout; ssout << fence << "[DATAREQUEST]" << fence << request.c_str() << fence << request.Headers() << fence << S << fence << sLen << fence;  Log(ssout.str());}
+        //{stringstream ssout; ssout << fence << "[DATARESPONDED]" << fence << NoBreaks(response.str()) << fence;  Log(ssout.str());}
     }
     protected:
     Request& request;
@@ -172,8 +135,8 @@ struct RequestManager : Request
     {
         if (  response.get() ) return *response.get(); 
 
-        response=unique_ptr<Response>( new Response_NotFound(*this, status) );
-        if ( response.get() ) { Log("Not Found Page 2"); return *response.get(); }
+        response=unique_ptr<Response>( new Response_DB(*this, status) );
+        if ( response.get() ) { return *response.get(); }
 
         if ( ! response.get() ) throw string( "Can't get response" );
         return *response.get(); 
@@ -241,8 +204,8 @@ void* service(void* lk)
 
             Socket ss( sock );
 
-            {stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
-                       Log( pidstr.str() + string("From ") + ss.dotted()  );}
+            //{stringstream pidstr; pidstr<<"GET PID " << getpid() << " ";
+             //          Log( pidstr.str() + string("From ") + ss.dotted()  );}
 
 
             ss.timeout(3, 0);
@@ -263,15 +226,15 @@ void* service(void* lk)
 
 
 
-            Log( string("Splitting ") + ss.dotted() );
+            //Log( string("Splitting ") + ss.dotted() );
             stringvector ipaddr;
             ipaddr.split( ss.dotted(), ":" );
-            Log( string("Checking ") + ss.dotted() );
+            //Log( string("Checking ") + ss.dotted() );
             if ( ipaddr.size() < 1 )
             {
-                Log( string("\033[31m") + ss.dotted() + string(" has no : \033[0m") );
+                //Log( string("\033[31m") + ss.dotted() + string(" has no : \033[0m") );
                 {const int T((rand()%10)+10); usleep(T); }
-                Log( "ipaddr error" );
+                //Log( "ipaddr error" );
                 continue;
             }
             const string addr( ipaddr[ 0 ] );
@@ -320,7 +283,7 @@ int main(const int argc, const char** argv)
     stringstream ssexcept;
     try
     {
-        Log("Initializing krunchdata");
+        //Log("Initializing krunchdata");
         SockQ Q;
         Locker& lock(Q.lock);
 
@@ -338,7 +301,7 @@ int main(const int argc, const char** argv)
 
         while ( children.size() < 16 )
         {
-            Log( "Spawn" );
+            //Log( "Spawn" );
             const pid_t newfork( fork() );
             if ( newfork == 0 )
             {
@@ -359,14 +322,14 @@ int main(const int argc, const char** argv)
                     {const int T((rand()%10)+20); usleep(T); }
                 }
 
-                Log("joining");
+                //Log("joining");
 
                 for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
                 {
                     pthread_t t(*it);
                     pthread_join(t, 0);
                 }
-                Log("exiting");
+                //Log("exiting");
             }  else {
                 children.push_back( newfork );
             }
@@ -380,7 +343,7 @@ int main(const int argc, const char** argv)
 
         for ( vector<pid_t>::iterator pit=children.begin();pit!=children.end();pit++)
         {
-            Log( "Parent killing child" );
+            //Log( "Parent killing child" );
             kill(*pit, SIGKILL);
         }
 #else // Not forking
@@ -402,7 +365,7 @@ int main(const int argc, const char** argv)
                     {const int T((rand()%10)+20); usleep(T); }
                 }
 
-                Log("joining");
+                //Log("joining");
 
                 for (vector<pthread_t>::iterator it=threads.begin();it!=threads.end();it++)
                 {
@@ -416,7 +379,7 @@ int main(const int argc, const char** argv)
         }
 
 #endif
-        Log( "Parent done" );
+        //Log( "Parent done" );
     }
     catch (const char* e) {ssexcept<<e;}
     catch (string& e) {ssexcept<<e;}
