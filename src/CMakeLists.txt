@@ -4,4 +4,5 @@ project("Information Kruncher Custom Web Server")
 
 # executable to compile
 add_executable(infokruncher "infokruncher.cpp")
+add_subdirectory( db )
 

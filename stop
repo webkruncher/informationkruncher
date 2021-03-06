@@ -15,4 +15,18 @@
     done;
 
 
+    for pid in `ps aux | grep "kruncherdb" | sed '/grep/d' | sed '/vim/d' | tr -s ' ' | cut -d ' ' -f2`; do
+        echo -ne "\033[44mpid:${pid}\033[0m\n"
+        ps aux | grep ${pid} | sed '/grep/d'
+        if [ "${pid}" == "" ]; then
+            echo -ne "\033[33mnot running yet\033[0m\n"
+        else
+            echo -ne "\033[31mkilling ${pid}\033[0m\n"
+            kill -HUP ${pid}			
+            kill -9 ${pid}			
+            #wget -O- localhost 2>/dev/null 1>/dev/null
+        fi
+
+    done;
+
 
