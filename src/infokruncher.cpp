@@ -52,6 +52,7 @@ using namespace std;
 #endif
 using namespace InformationSocket;
 #include "tools.h"
+#include "processtools.h"
 using namespace JTools;
 
 #include "oformat.h"

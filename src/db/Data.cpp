@@ -37,6 +37,7 @@ using namespace std;
 #include "../infosock.h"
 using namespace InformationSocket;
 #include "../tools.h"
+#include "../processtools.h"
 using namespace JTools;
 
 #include "../oformat.h"

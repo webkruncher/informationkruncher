@@ -26,37 +26,13 @@
  */
 
 
-#include <deque>
+
 #include <iostream>
-#include <vector>
 #include <string>
-#include <fstream>
-#include <functional>
-using namespace std;
-#include "../infosock.h"
-using namespace InformationSocket;
-#include "../tools.h"
-using namespace JTools;
-
-#include "../oformat.h"
-using namespace OFormat;
-
-#include <sys/ioctl.h>
-
-#include "../spinlock.h"
-
-
-#include <signal.h>
-#include "dataset.h"
-using namespace DataSet;
-
 #include <sstream>
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
 #include <list>
-#include <iostream>
-#include <fstream>
 #include <deque>
 using namespace std;
 typedef string stringtype;
@@ -64,7 +40,10 @@ typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
 #include "DataKruncher.h"
-using namespace std;
+#include <sys/ioctl.h>
+#include "../tools.h"
+using namespace JTools;
+
 namespace DataKruncher
 {
 	ostream& Item::operator<<(ostream& o) 
