@@ -79,7 +79,17 @@ namespace XmlPayload
 			ret=new Item(_doc,parent,name); 
 			return ret;
 		}
-		virtual ostream& operator<<(ostream& o) { XmlNode::operator<<(o); return o;}
+		virtual ostream& operator<<(ostream& o) 
+		{ 
+			Log ( name );
+			if ( name == "get" )
+			{
+				o << "<got>dbvalue</got>";
+			} else {
+				XmlNode::operator<<(o); 
+			}
+			return o;
+		}
 		virtual bool operator()(ostream& o) { return XmlNode::operator()(o); }
 		Item(Xml& _doc,const XmlNodeBase* _parent,stringtype _name) : XmlNode(_doc,_parent,_name) {}
 	};
@@ -144,7 +154,8 @@ struct Response_NotFound : Response
 
         sock.write(response.str().c_str(), response.str().size());
         sock.flush();
-        stringstream ssout; ssout << fence << "[DATAREQUEST]" << fence << request.c_str() << fence << request.Headers() << fence << S << fence << sLen << fence;  Log(ssout.str());
+        {stringstream ssout; ssout << fence << "[DATAREQUEST]" << fence << request.c_str() << fence << request.Headers() << fence << S << fence << sLen << fence;  Log(ssout.str());}
+        {stringstream ssout; ssout << fence << "[DATARESPONDED]" << fence << NoBreaks(response.str()) << fence;  Log(ssout.str());}
     }
     protected:
     Request& request;
@@ -229,6 +240,7 @@ void* service(void* lk)
                 continue;
             }
 
+Log( "Got a data request" );
 
             //cerr << "Serving: " << ( UsingSsl ? "SSL" : "PLAINTEXT" ) << endl; cerr.flush();
             Socket ss( sock );

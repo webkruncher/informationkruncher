@@ -198,6 +198,65 @@ struct Response_Home : Response
         string file(tbd.c_str());
         const string contenttype(ContentType(srequest));
 
+	{
+		stringstream ssdb, ssxml;
+		ssxml << "<data><get>home</get></data>";
+		ssdb << "HTTP/1.1 GET /data" << endl;
+		ssdb << "Content-length: " << ssxml.str().size() << endl << endl;
+		ssdb << ssxml.str() << endl;
+		Log(NoBreaks(ssdb.str()));
+		Socket db( (char*) "127.0.0.1", 99 );
+		if ( db.open() && db.connect() )
+		{
+			db.timeout(1, 00);
+			db.blocking(true);
+			db.write( ssdb.str().c_str(), ssdb.str().size() );
+			db.flush();
+			string dbreqponseline;
+			stringstream dbresponse;
+			
+			icstringvector dbheaders;
+			while ( true ) 
+			{
+				stringtype line;
+				db.getline( line );
+				if ( line.empty() ) break;
+				if ( dbreqponseline.empty() )
+				{
+					dbreqponseline=line;
+				} else {
+					dbheaders.push_back( line );
+				}
+			}
+			string sdbcl;
+			for (icstringvector::const_iterator it=dbheaders.begin();it!=dbheaders.end();it++)
+			{
+				icstring line(*it);
+				if (line.find("content-length:")!=string::npos) sdbcl=mimevalue(line.c_str());
+			}
+			const int Len( atoi( sdbcl.c_str() ) );
+			if ( ( sdbcl.empty() ) || ( Len>1024 ) )
+			{ 
+				stringstream ssout; ssout << fence << "[DATARESPONSE-INVALIDSIZE]" << fence << dbresponse.str()<< fence;
+				Log(ssout.str());
+				db.flush(); 
+				return ;
+			} 
+
+			char buf[ Len +1 ];
+			memset( buf, 0, Len+ 1 );
+			db.read( buf, Len );
+			stringtype S( buf );
+			stringstream ssout; ssout << fence << "[DATASPONSE]" << fence << S << fence; Log( ssout.str() ); 
+			
+		} else {
+			stringstream ssout; ssout << fence << "[DATA-UNAVAILABLE]" << fence ;
+			Log(ssout.str());
+		}
+		
+	}
+	
+
         LoadFile(file.c_str(), ss);
         status=200;
 

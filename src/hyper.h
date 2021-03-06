@@ -29,6 +29,18 @@
 
 namespace Hyper
 { 
+		inline string mimevalue(string line)
+		{
+			size_t c(line.find(":"));
+			if (c==string::npos) return "";
+			c++;
+			line.erase(0, c);
+			size_t s(line.find_first_not_of("\r\n\f\t "));
+			if ( (s!=0) && (s!=string::npos) ) line.erase(0, s);
+			size_t e(line.find_first_of("\r\n\f\t "));
+			if (e!=string::npos) line.erase(e, line.size()-e);
+			return line;
+		}
 	struct Response 
 	{
 		virtual void operator ()() 
@@ -72,18 +84,6 @@ namespace Hyper
             return *response.get(); 
         }
 		protected:
-		string mimevalue(string line)
-		{
-			size_t c(line.find(":"));
-			if (c==string::npos) return "";
-			c++;
-			line.erase(0, c);
-			size_t s(line.find_first_not_of("\r\n\f\t "));
-			if ( (s!=0) && (s!=string::npos) ) line.erase(0, s);
-			size_t e(line.find_first_of("\r\n\f\t "));
-			if (e!=string::npos) line.erase(e, line.size()-e);
-			return line;
-		}
 
 		const icstring& request;
 		const icstringvector& headers;
