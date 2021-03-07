@@ -27,11 +27,14 @@
 
 #ifndef INFO_DATA
 #define INFO_DATA
+#include "hyperbase.h"
 
 namespace KrunchData
 {
-	struct DataBase
+	struct DataBase : virtual HyperBase
 	{
+		DataBase(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
+			HyperBase(_request, _headers, _sock) {}
 		operator string ()
 		{
 			stringstream ssdb, ssxml;

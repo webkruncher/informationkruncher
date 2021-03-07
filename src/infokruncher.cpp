@@ -414,18 +414,22 @@ struct Response_Page : Response
     virtual ostream& operator<<(ostream& o) const { o << fence << "[page]" << fence << request.Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 };
 
-struct RequestManager : Request
+struct RequestManager : Request, KrunchData::DataBase
 {
     RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
-        Request(_request, _headers, _sock ) {}
+        HyperBase(_request, _headers, _sock ),
+        Request(_request, _headers, _sock ),
+        KrunchData::DataBase(_request, _headers, _sock )
+    {}
 
     operator Response& ()
     {
         if (  response.get() ) return *response.get(); 
         const string tbd(Tbd(request, *this));
 
-	KrunchData::DataBase db;
+        KrunchData::DataBase& db(*this);
 	string data( db );
+	{stringstream ssout; ssout << fence << "[DBRESULT]" << fence << data << fence; Log (ssout.str());}
 
         ifBinary(tbd);
         if (  response.get() ) return *response.get(); 

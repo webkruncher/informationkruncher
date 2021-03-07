@@ -27,6 +27,8 @@
 #ifndef HYPER_H
 #define HYPER_H
 
+#include "hyperbase.h"
+
 namespace Hyper
 { 
 		inline string mimevalue(string line)
@@ -49,10 +51,10 @@ namespace Hyper
         }
 	};
 
-	struct Request 
+	struct Request : virtual HyperBase
 	{
 		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
-			request(_request), headers(_headers), sock(_sock) {}
+			HyperBase(_request, _headers, _sock) {}
         //virtual ~Request() { response.release(); } 
 		const char* c_str() const {return request.c_str();}
 		operator Socket& () const {return sock;}
@@ -78,17 +80,14 @@ namespace Hyper
 			return true;
 		}
 		string host; 
-        virtual operator Response& () 
-        { 
-            if ( ! response.get() ) throw string( "Can't get response" );
-            return *response.get(); 
-        }
+		virtual operator Response& () 
+		{ 
+		    if ( ! response.get() ) throw string( "Can't get response" );
+		    return *response.get(); 
+		}
 		protected:
 
-		const icstring& request;
-		const icstringvector& headers;
-        Socket& sock;
-        unique_ptr<Response> response;
+		unique_ptr<Response> response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};
 } // Hyper

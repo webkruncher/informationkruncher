@@ -27,6 +27,8 @@
 #ifndef DATASET_H
 #define DATASET_H
 
+#include "../hyperbase.h"
+
 namespace DataSet
 { 
 	struct Response 
@@ -37,10 +39,10 @@ namespace DataSet
         }
 	};
 
-	struct Request 
+	struct Request : virtual Hyper::HyperBase
 	{
 		Request(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
-			request(_request), headers(_headers), sock(_sock) {}
+			Hyper::HyperBase(_request,_headers, _sock) {}
 
 		const char* c_str() const {return request.c_str();}
 		operator Socket& () const {return sock;}
@@ -95,10 +97,7 @@ namespace DataSet
 			return line;
 		}
 
-		const icstring& request;
-		const icstringvector& headers;
-        Socket& sock;
-        unique_ptr<Response> response;
+		unique_ptr<Response> response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};
 } // DataSet
