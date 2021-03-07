@@ -27,7 +27,7 @@
 #ifndef HYPER_H
 #define HYPER_H
 
-#include "hyperbase.h"
+#include <hyperbase.h>
 
 namespace Hyper
 { 

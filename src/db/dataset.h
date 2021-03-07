@@ -27,7 +27,7 @@
 #ifndef DATASET_H
 #define DATASET_H
 
-#include "../hyperbase.h"
+#include <hyperbase.h>
 
 namespace DataSet
 { 

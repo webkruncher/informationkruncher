@@ -13,6 +13,7 @@ target_include_directories(
 	kruncherdb
 	PRIVATE
 	../../../exexml
+	../../include
 	/usr/local/include/db4/
 )
 
