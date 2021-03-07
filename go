@@ -21,8 +21,7 @@ if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
 	./src.build/db/kruncherdb& 
 fi
 
-#krunchdbunittester
-if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
+if [ "${target}" == "dbut" ]; then
 	echo -ne "\033[35mStarting krunchdbunittester\033[0m\n"
 	./src.build/db/krunchdbunittester& 
 fi
