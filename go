@@ -5,7 +5,7 @@ target=${1-all}
 #[ -f /var/log/syslog ] && sudo tail -f /var/log/syslog | grep -i --line-buffered "jmt" | grep "favicon.ico" | cut -d: -f4-20&
 
 ./stop $@
-./Build.ksh $@
+./build $@
 
 echo -ne "\033[44m\033[36mRun target:${target}\033[0m\n"
 
