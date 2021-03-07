@@ -69,7 +69,7 @@ volatile bool KILL(false);
 #include <signal.h>
 #include <DataBase.h>
 
-
+#include <uuid.h>
 
 string SourceTarget(const string& who, const string& what, const string dflt="/index.html")
 {
@@ -207,6 +207,32 @@ struct Response_Home : Response
         LoadFile(file.c_str(), ss);
         status=200;
 
+	string ExistingCookie( request.sValue( "Cookie" ) );
+	{stringstream ssl; ssl<<"ExistingCookie:" << ExistingCookie; Log( ssl.str() );}
+	const string CookieName("webkruncher.com.wip");
+	
+	string NewCookie;
+
+	if ( ExistingCookie.empty() )
+	{
+		uuid_t  UuId;
+		unsigned int uuidstatus( 0 );
+		uuid_create(&UuId, &uuidstatus);
+
+
+		char* result( NULL );	
+		uuid_to_string(&UuId, &result, &uuidstatus);
+		if ( result ) 
+		{
+			NewCookie=result;
+			free( result );
+			{stringstream ssl; ssl<<"Created uuid:" << NewCookie; Log( ssl.str() );}
+		} else {
+			Log("Cannot create uuid");
+		}
+	}
+
+
         stringstream response;
         response << "HTTP/1.1 ";
         response << status << " " << statusText(status) << endl;
@@ -214,6 +240,7 @@ struct Response_Home : Response
         response << "Server: WebKruncher" << endl;
         response << "Connection: close" << endl;
         response << "Content-Length:" << ss.str().size() << endl;
+	if ( ! NewCookie.empty() ) response << "Set-Cookie:" << CookieName << "=" << NewCookie << ";" << endl;
         response << endl;
         response << ss.str();
         sock.write(response.str().c_str(), response.str().size());

@@ -73,16 +73,6 @@ namespace DataSet
 		    if ( ! response.get() ) throw string( "Can't get response" );
 		    return *response.get(); 
 		}
-		string sValue( stringtype what )
-		{
-			stringtype W( what ); W +=stringtype(":" );
-			for (icstringvector::const_iterator it=headers.begin();it!=headers.end();it++)
-			{
-				icstring line(*it);
-				if (line.find( W.c_str() ) !=string::npos) return Hyper::mimevalue(line.c_str());
-			}
-			return "";
-		}
 		unique_ptr<Response> response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};

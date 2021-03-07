@@ -38,7 +38,12 @@ namespace KrunchData
 		operator string ()
 		{
 			stringstream ssdb, ssxml;
-			ssxml << "<data><get>home</get></data>";
+			//ssxml << "<data><get>home</get></data>";
+			ssxml << "<data>" << endl;
+			ssxml << "<ip>" << endl;
+			ssxml << sock.dotted() << endl;
+			ssxml << "</ip>" << endl;
+			ssxml << "</data>" << endl;
 			ssdb << "HTTP/1.1 GET /data" << endl;
 			ssdb << "Content-length: " << ssxml.str().size() << endl << endl;
 			ssdb << ssxml.str() << endl;
