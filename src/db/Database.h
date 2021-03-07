@@ -31,7 +31,7 @@ namespace BdbSpace
 	struct DataBase
 	{
 		public:
-			DataBase( const string _databasefname, DataBaseEnvironment& _environment, const u_int32_t _openFlags, DBTYPE _dbflags = DB_BTREE, u_int32_t _extraFlags = NULL ) 
+			DataBase( const string _databasefname, DataBaseEnvironment& _environment, const u_int32_t _openFlags, DBTYPE _dbflags = DB_BTREE, u_int32_t _extraFlags = 0 ) 
 				: databasefname( _databasefname ), environment( _environment ), dbp( NULL ) , openFlags( _openFlags ), dbflags( _dbflags ), extraFlags( _extraFlags ) {}
 			virtual ~DataBase()
 			{
