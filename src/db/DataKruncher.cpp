@@ -148,6 +148,7 @@ namespace DataKruncher
 		ItemCache& cache( *this );
 
 		
+		
 
 		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );

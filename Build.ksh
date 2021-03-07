@@ -8,8 +8,6 @@ if [ "${target}" == "all" ] || [ "${target}" == "infokruncher" ]; then
 	#[ -f src.build/informationkruncher ] && rm src.build/informationkruncher
 	cmake  -S src/ -B src.build/  --target infokruncher
 	cmake  --build src.build/ --target infokruncher
-	#src.build/informationkruncher             
-	[ -f src.build/informationkruncher ] && cat test.txt | src.build/informationkruncher
 fi
 
 if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
@@ -17,7 +15,12 @@ if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
 	#[ -f src.build/db/kruncherdb ] && rm src.build/db/kruncherdb
 	cmake  -S src/ -B src.build/  --target kruncherdb
 	cmake  --build src.build/ --target kruncherdb
-	#src.build/informationkruncher             
-	[ -f src.build/db/kruncherdb ] && cat test.txt | src.build/db/kruncherdb
+fi
+
+if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
+	echo -ne "\033[32mBuilding krunchdbunittester\033[0m\n"
+	#[ -f src.build/db/kruncherdb ] && rm src.build/db/krunchdbunittester
+	cmake  -S src/ -B src.build/  --target krunchdbunittester
+	cmake  --build src.build/ --target krunchdbunittester
 fi
 

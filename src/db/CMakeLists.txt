@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project("Information Kruncher Custom Data Server")
 
-
 add_executable(
 	kruncherdb 
 	Data.cpp
@@ -29,5 +28,36 @@ target_link_libraries(
 	kruncherdb
 	pthread
 	db_cxx
+)
+
+
+
+
+
+
+add_executable(
+	krunchdbunittester 
+	ut.cpp
+)
+
+target_include_directories( 
+	krunchdbunittester 
+	PRIVATE
+	../../../exexml
+	../../include
+	include
+	/usr/local/include/db4/
+)
+
+
+target_link_directories( 
+	krunchdbunittester 
+	PRIVATE
+	/usr/local/lib/db4/
+)
+
+target_link_libraries( 
+	krunchdbunittester 
+	pthread
 )
 

@@ -27,3 +27,8 @@ if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
 	Killer kruncherdb
 fi
 
+if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
+	echo -ne "\033[33m\033[44mStopping krunchdbunittester\033[0m\n"
+	Killer krunchdbunittester
+fi
+

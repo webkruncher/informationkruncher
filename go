@@ -21,21 +21,8 @@ if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
 	./src.build/db/kruncherdb& 
 fi
 
-#	if [ 0 == 1 ]; then
-#		./src.build/infokruncher -d
-#		./src.build/db/kruncherdb -d
-#	else
-#		if [ -f ./src.build/infokruncher ] && [ -f ./src.build/db/kruncherdb ]; then
-#
-#			./src.build/infokruncher& 
-#			./src.build/db/kruncherdb& 
-#
-#			#[ -f /var/log/syslog ] && sudo tail -f /var/log/syslog | grep -i --line-buffered "jmt" | grep "favicon.ico" | cut -d: -f4-20&
-#
-#		else
-#			echo -ne "\033[31mBuild failed\033[0m\n"
-#			read ok
-#		fi
-#	fi
-#
-
+#krunchdbunittester
+if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
+	echo -ne "\033[35mStarting krunchdbunittester\033[0m\n"
+	./src.build/db/krunchdbunittester& 
+fi
