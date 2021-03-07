@@ -88,10 +88,11 @@ struct Response_DB : Response
 	sock.read( buf, Len );
 	stringtype S( buf );
 
-	DataKruncher::Payload config;
-	config.Load(S, NULL);
-	config.TabLevel(0);
-	ss<<config;
+	DataKruncher::Payload data( request );
+	data.Load(S, NULL);
+	data.TabLevel(0);
+	if ( ! data ) throw string("Payload error in db");
+	ss<<data;
 
 
         status=200;

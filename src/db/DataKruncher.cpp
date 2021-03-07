@@ -121,16 +121,37 @@ int testmain( int argc, char** argv )
 
 namespace DataKruncher
 {
-	ostream& Item::operator<<(ostream& o) 
-	{ 
-		Log ( name );
-		if ( name == "get" )
+	ostream& Item::operator<<(ostream& o) { return XmlNode::operator<<(o); }
+
+	Item::operator bool ()
+	{
+		Xml& root( GetDoc() );
+		Xml& document(static_cast<Xml&>(root));
+		Payload& payload(static_cast<Payload&>(document));
+		ItemCache& cache(payload);
+		cache[ name ] = textsegments[0];
+		for (XmlFamily::XmlNodeSet::iterator 
+			it=children.begin();it!=children.end();it++)
 		{
-			o << "<got>dbvalue</got>";
-		} else {
-			XmlNode::operator<<(o); 
+			Item& n=static_cast<Item&>(*(*it));
+			if ( ! n ) return false;
 		}
-		return o;
+		return true;
+	}
+
+	Payload::operator bool ()
+	{
+		if (!Root) throw string("No root node"); 
+		Item& nodes( static_cast<Item&>(*Root) );
+		const bool result( !!nodes );
+		if ( ! result ) return false;
+		ItemCache& cache( *this );
+
+		
+
+		stringstream ss; ss << request.request << fence << request.headers << fence  << cache;
+		Log( NoBreaks( ss.str() ) );
+		return true;
 	}
 } // DataKruncher
 

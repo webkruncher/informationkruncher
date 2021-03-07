@@ -27,9 +27,27 @@
 
 #ifndef DATA_KRUNCHER_H
 #define DATA_KRUNCHER_H
+#include <infosock.h>
+using namespace InformationSocket;
+#include <infotools.h>
+using namespace InfoTools;
+#include <hyperbase.h>
 namespace DataKruncher
 {
 	using namespace XmlFamily;
+
+	struct ItemCache : map< string, string >
+	{
+		friend ostream& operator<<(ostream&,const ItemCache&);
+		ostream& operator<<(ostream& o) const
+		{
+			for (const_iterator it=begin();it!=end();it++) o << it->first << ":" << it->second  << endl;
+			return o;
+		}
+	}; 
+	inline ostream& operator<<(ostream& o,const ItemCache& m)
+		{ return m.operator<<(o); }
+
 	struct Item : XmlNode
 	{
 		friend struct Payload;
@@ -39,18 +57,22 @@ namespace DataKruncher
 			ret=new Item(_doc,parent,name); 
 			return ret;
 		}
+		operator bool ();
 		virtual ostream& operator<<(ostream&);
 		virtual bool operator()(ostream& o) { return XmlNode::operator()(o); }
 		Item(Xml& _doc,const XmlNodeBase* _parent,stringtype _name) : XmlNode(_doc,_parent,_name) {}
 	};
 	inline ostream& operator<<(ostream& o,Item& xmlnode){return xmlnode.operator<<(o);}
 
-	struct Payload : Xml
+	struct Payload : Xml, ItemCache
 	{
-		Payload(){} 
+		Payload( Hyper::HyperBase& _request ) : request( _request ) {} 
 		virtual XmlNode* NewNode(Xml& _doc,stringtype name) { return new Item(_doc,NULL,name); }
 		ostream& operator<<(ostream& o) { Xml::operator<<(o); return o;}
 		operator Item& () { if (!Root) throw string("No root node"); return static_cast<Item&>(*Root); }
+		operator bool ();
+		private:
+		Hyper::HyperBase& request; 
 	};
 	inline ostream& operator<<(ostream& o,Payload& xml){return xml.operator<<(o);}
 } // DataKruncher

@@ -63,7 +63,7 @@ namespace DataSet
 				icstring line(*it);
 				//if (line.find("host:")==0) {mout << fence << brcin << NoBreaks(line.c_str()) << brcout << fence << endl; }
 				//else {mout << fence << aglin << NoBreaks(line.c_str()) << aglout << fence << endl; }
-				if (line.find("host:")!=string::npos) host=mimevalue(line.c_str());
+				if (line.find("host:")!=string::npos) host=Hyper::mimevalue(line.c_str());
 			}
 			return true;
 		}
@@ -79,24 +79,10 @@ namespace DataSet
 			for (icstringvector::const_iterator it=headers.begin();it!=headers.end();it++)
 			{
 				icstring line(*it);
-				if (line.find( W.c_str() ) !=string::npos) return mimevalue(line.c_str());
+				if (line.find( W.c_str() ) !=string::npos) return Hyper::mimevalue(line.c_str());
 			}
 			return "";
 		}
-		protected:
-		string mimevalue(string line)
-		{
-			size_t c(line.find(":"));
-			if (c==string::npos) return "";
-			c++;
-			line.erase(0, c);
-			size_t s(line.find_first_not_of("\r\n\f\t "));
-			if ( (s!=0) && (s!=string::npos) ) line.erase(0, s);
-			size_t e(line.find_first_of("\r\n\f\t "));
-			if (e!=string::npos) line.erase(e, line.size()-e);
-			return line;
-		}
-
 		unique_ptr<Response> response;
 		virtual ostream& operator<<(ostream& o) const { o << fence << "[request]" << fence << Host() << fence << RequestUrl(request.c_str()) << fence; return o; }
 	};

@@ -28,11 +28,22 @@
 #define HYPERBASE_H
 namespace Hyper
 {
+		inline string mimevalue(string line)
+		{
+			size_t c(line.find(":"));
+			if (c==string::npos) return "";
+			c++;
+			line.erase(0, c);
+			size_t s(line.find_first_not_of("\r\n\f\t "));
+			if ( (s!=0) && (s!=string::npos) ) line.erase(0, s);
+			size_t e(line.find_first_of("\r\n\f\t "));
+			if (e!=string::npos) line.erase(e, line.size()-e);
+			return line;
+		}
 	struct HyperBase
 	{
 	    HyperBase(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
 			request(_request), headers(_headers), sock(_sock) {}
-		protected:
 		const icstring& request;
 		const icstringvector& headers;
 		Socket& sock;
