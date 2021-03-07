@@ -44,6 +44,10 @@ typedef stringstream stringstreamtype;
 #include "../tools.h"
 using namespace JTools;
 
+#include <db_cxx.h>
+#include "Database.h" 
+#include "DbCursor.h" 
+
 namespace DataKruncher
 {
 	ostream& Item::operator<<(ostream& o) 

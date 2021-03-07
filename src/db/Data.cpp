@@ -27,45 +27,36 @@
 
 #define SERVICE_PORT 99
 
-#include <deque>
 #include <iostream>
-#include <vector>
 #include <string>
-#include <fstream>
-#include <functional>
-using namespace std;
-#include "../infosock.h"
-using namespace InformationSocket;
-#include "../tools.h"
-#include "../processtools.h"
-using namespace JTools;
-
-#include "../oformat.h"
-using namespace OFormat;
-
-#include <sys/ioctl.h>
-
-#include "../spinlock.h"
-
-volatile bool KILL(false);
-
-#include <signal.h>
-#include "dataset.h"
-using namespace DataSet;
-
 #include <sstream>
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
 #include <list>
-#include <iostream>
-#include <fstream>
 #include <deque>
 using namespace std;
 typedef string stringtype;
 typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
+#include "DataKruncher.h"
+#include <sys/ioctl.h>
+#include "../tools.h"
+using namespace JTools;
+
+
+
+#include "../tools.h"
+#include <unistd.h>
+#include <signal.h>
+#include "../processtools.h"
+#include "../spinlock.h"
+volatile bool KILL(false);
+#include "../infosock.h"
+using namespace InformationSocket;
+#include <signal.h>
+#include "dataset.h"
+using namespace DataSet;
 #include "DataKruncher.h"
 
 struct Response_DB : Response
