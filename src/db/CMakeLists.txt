@@ -14,6 +14,7 @@ target_include_directories(
 	PRIVATE
 	../../../exexml
 	../../include
+	include
 	/usr/local/include/db4/
 )
 

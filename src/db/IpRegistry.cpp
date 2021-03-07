@@ -10,8 +10,8 @@
 #include <db_cxx.h>
 using namespace std;
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#include "IpRegistry.h" 
-#include "DbCursor.h" 
+#include <IpRegistry.h">
+#include <DbCursor.h">
 #include <sys/stat.h>
 
 // /home/jmt/libdb/examples/cxx/txn_guide

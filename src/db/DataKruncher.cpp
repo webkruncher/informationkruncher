@@ -39,14 +39,14 @@ typedef string stringtype;
 typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
-#include "DataKruncher.h"
+#include <DataKruncher.h>
 #include <sys/ioctl.h>
-#include "../tools.h"
-using namespace JTools;
+#include <infotools.h>
+using namespace InfoTools;
 
 #include <db_cxx.h>
-#include "Database.h" 
-#include "DbCursor.h" 
+#include <Database.h>
+#include <DbCursor.h>
 
 using namespace BdbSpace;
 

@@ -27,7 +27,7 @@
 #ifndef KRUNCHPROCESSTOOLS
 #define KRUNCHPROCESSTOOLS
 
-namespace JTools
+namespace InfoTools
 {
 
 	struct Daemonizer

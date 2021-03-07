@@ -46,28 +46,28 @@
 #include <functional>
 using namespace std;
 #ifdef USE_SSL
-#include "infossock.h"
+#include <infossock.h>
 #else
-#include "infosock.h"
+#include <infosock.h>
 #endif
 using namespace InformationSocket;
-#include "tools.h"
-#include "processtools.h"
-using namespace JTools;
+#include <infotools.h>
+using namespace InfoTools;
+#include <processtools.h>
 
-#include "oformat.h"
+#include <oformat.h>
 using namespace OFormat;
 
 #include <sys/ioctl.h>
 
-#include "spinlock.h"
+#include <spinlock.h>
 
-#include "hyper.h"
+#include <hyper.h>
 using namespace Hyper;
 volatile bool KILL(false);
 
 #include <signal.h>
-#include "DataBase.h"
+#include <DataBase.h>
 
 
 

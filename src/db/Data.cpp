@@ -39,25 +39,25 @@ typedef string stringtype;
 typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
-#include "DataKruncher.h"
+#include <DataKruncher.h>
 #include <sys/ioctl.h>
-#include "../tools.h"
-using namespace JTools;
+#include <infotools.h>
+using namespace InfoTools;
+
+#include <infotools.h>
 
 
-
-#include "../tools.h"
 #include <unistd.h>
 #include <signal.h>
-#include "../processtools.h"
-#include "../spinlock.h"
+#include <processtools.h>
+#include <spinlock.h>
 volatile bool KILL(false);
-#include "../infosock.h"
+#include <infosock.h>
 using namespace InformationSocket;
 #include <signal.h>
-#include "dataset.h"
+#include <dataset.h>
 using namespace DataSet;
-#include "DataKruncher.h"
+#include <DataKruncher.h>
 #include <db_cxx.h>
 
 struct Response_DB : Response

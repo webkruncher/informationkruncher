@@ -27,7 +27,7 @@
 
 #ifndef INFO_DATA
 #define INFO_DATA
-#include "hyperbase.h"
+#include <hyperbase.h>
 
 namespace KrunchData
 {

@@ -41,7 +41,7 @@ typedef std::stringstream stringstreamtype;
 extern volatile bool KILL;
 
 
-namespace JTools
+namespace InfoTools
 {
 	using namespace OFormat;
 	inline void Log(const string& what) { if (1) syslog(1,"%s",what.c_str()); }
