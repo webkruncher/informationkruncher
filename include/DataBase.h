@@ -96,6 +96,7 @@ namespace KrunchData
 				stringstream ssout; ssout << fence << "[DATA-UNAVAILABLE]" << fence ;
 				Log(ssout.str());
 			}
+			db.close();
 			return "";
 		}
 	};
