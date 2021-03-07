@@ -1,32 +1,29 @@
+#!/usr/local/bin/bash
+target=${1-all}
+
+echo -ne "\033[44m\033[36mStop target:${target}\033[0m\n"
+
+function Killer
+{
+	pid="x"
+	while [ "${pid}" != ""  ]; do
+		pid=`ps aux | grep "${1}" | sed '/grep/d' | sed '/vim/d' | sed '/bash/d' | tr -s ' ' | cut -d ' ' -f2`
+		if [ "${pid}" != "" ]; then
+			echo -ne "\033[K\033[33m\033[44mKilling ${1}\033[0m\r"
+			kill -9 ${pid} 2>> /dev/null
+		fi
+	done
+	echo -ne "\033[K\033[33m\033[44mKilled ${1}\033[0m\n"
+}
+
+if [ "${target}" == "all" ] || [ "${target}" == "infokruncher" ]; then
+	echo -ne "\033[33m\033[44mStopping infokruncher\033[0m\n"
+	Killer infokruncher
+fi
 
 
-    for pid in `ps aux | grep "infokruncher" | sed '/grep/d' | sed '/vim/d' | tr -s ' ' | cut -d ' ' -f2`; do
-        echo -ne "\033[44mpid:${pid}\033[0m\n"
-        ps aux | grep ${pid} | sed '/grep/d'
-        if [ "${pid}" == "" ]; then
-            echo -ne "\033[33mnot running yet\033[0m\n"
-        else
-            echo -ne "\033[31mkilling ${pid}\033[0m\n"
-            kill -HUP ${pid}			
-            kill -9 ${pid}			
-            #wget -O- localhost 2>/dev/null 1>/dev/null
-        fi
-
-    done;
-
-
-    for pid in `ps aux | grep "kruncherdb" | sed '/grep/d' | sed '/vim/d' | tr -s ' ' | cut -d ' ' -f2`; do
-        echo -ne "\033[44mpid:${pid}\033[0m\n"
-        ps aux | grep ${pid} | sed '/grep/d'
-        if [ "${pid}" == "" ]; then
-            echo -ne "\033[33mnot running yet\033[0m\n"
-        else
-            echo -ne "\033[31mkilling ${pid}\033[0m\n"
-            kill -HUP ${pid}			
-            kill -9 ${pid}			
-            #wget -O- localhost 2>/dev/null 1>/dev/null
-        fi
-
-    done;
-
+if [ "${target}" == "all" ] || [ "${target}" == "kruncherdb" ]; then
+	echo -ne "\033[33m\033[44mStopping kruncherdb\033[0m\n"
+	Killer kruncherdb
+fi
 
