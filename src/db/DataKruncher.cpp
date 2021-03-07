@@ -149,7 +149,7 @@ namespace DataKruncher
 
 		
 
-		stringstream ss; ss << request.request << fence << request.headers << fence  << cache;
+		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );
 		return true;
 	}
