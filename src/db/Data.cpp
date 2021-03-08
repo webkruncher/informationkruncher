@@ -110,6 +110,7 @@ struct Response_DB : Response
 
         sock.write(response.str().c_str(), response.str().size());
         sock.flush();
+        sock.close();
         //{stringstream ssout; ssout << fence << "[DATAREQUEST]" << fence << request.c_str() << fence << request.Headers() << fence << S << fence << sLen << fence;  Log(ssout.str());}
         //{stringstream ssout; ssout << fence << "[DATARESPONDED]" << fence << NoBreaks(response.str()) << fence;  Log(ssout.str());}
     }
