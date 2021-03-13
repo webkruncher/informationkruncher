@@ -183,7 +183,9 @@ namespace DataKruncher
 			//	or translation units, leveraging standard, and
 			//	defacto standard solutions, minimizing the complexity of user-code.
 
-		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;
+		return Revision_0( cache );
+
+		stringstream ss; ss << request.sock.dotted() << fence << "ERROR|Payload::bool|No Revision" << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );
 		return true;
 	}

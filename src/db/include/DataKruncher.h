@@ -73,6 +73,12 @@ namespace DataKruncher
 		operator bool ();
 		private:
 		Hyper::HyperBase& request; 
+		bool Revision_0(ItemCache&)
+		{
+			stringstream ss; ss << "Revision_0" << fence << request.sock.dotted() << fence << request.request << fence << request.headers << fence ; 
+			Log( NoBreaks( ss.str() ) );
+			return true;
+		}
 	};
 	inline ostream& operator<<(ostream& o,Payload& xml){return xml.operator<<(o);}
 } // DataKruncher
