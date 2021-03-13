@@ -160,10 +160,19 @@ namespace DataKruncher
 		// Initial Approach:
 		//	Naively design simple access to list of 255 elements (simple table)
 		//	Satisfy high level user requirments with stubs.
-		//	Aproxamate solution, test and refine plan.
+		//	Aproximate solution, test and refine plan.
 
 
-		
+			// Plan Refinement, Iteration 10 Goal:
+			//	Provide efficient and simple solution to
+			//	safe and secure access to minimal, systems
+			//	level solution, leveraging the standard libraries 
+	
+			// Iteration 20 Goal:
+			//	Refine all components, generalizing and parameterizing
+			//	structures, abstracting from the core functionality, and
+			//	proving a simple, standards based solution for generalized
+			//	data access using BerkleyDB,
 
 		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );
