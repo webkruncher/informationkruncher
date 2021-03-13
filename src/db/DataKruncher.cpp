@@ -148,6 +148,9 @@ namespace DataKruncher
 		ItemCache& cache( *this );
 
 		// Plan: 
+		//	Overall Goal:
+		//		Make this function as short as possible while leveraging the full
+		//		breath of the services offered.
 		//	Store hierarchy of ip octets in self balancing structures.
 		//	Map incoming requests to specific entry
 		//	Control usage and access through common subsystem (streams/brokers)
@@ -173,6 +176,12 @@ namespace DataKruncher
 			//	structures, abstracting from the core functionality, and
 			//	proving a simple, standards based solution for generalized
 			//	data access using BerkleyDB,
+
+		// Finish:
+			//	Demonstrate fast, efficient, and atomic data access via BerkleyDB
+			//	using generalized methods provided within specialized headers and 
+			//	or translation units, leveraging standard, and
+			//	defacto standard solutions, minimizing the complexity of user-code.
 
 		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );
