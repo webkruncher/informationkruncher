@@ -127,13 +127,13 @@ namespace DataKruncher
 	{
 		Xml& root( GetDoc() );
 		Xml& document(static_cast<Xml&>(root));
-		Payload& payload(static_cast<Payload&>(document));
+		Payload& payload( static_cast<Payload&>(document) );
 		ItemCache& cache(payload);
 		cache[ name ] = textsegments[0];
 		for (XmlFamily::XmlNodeSet::iterator 
 			it=children.begin();it!=children.end();it++)
 		{
-			Item& n=static_cast<Item&>(*(*it));
+			Item& n( static_cast<Item&>(*(*it)) );
 			if ( ! n ) return false;
 		}
 		return true;
@@ -147,7 +147,22 @@ namespace DataKruncher
 		if ( ! result ) return false;
 		ItemCache& cache( *this );
 
-		
+		// Plan: 
+		//	Store hierarchy of ip octets in self balancing structures.
+		//	Map incoming requests to specific entry
+		//	Control usage and access through common subsystem (streams/brokers)
+		//	Keep high level access at O(1)*4 O(1)( times each of four octets in ip addr )
+		//	Ensure each level operates efficiently, carefully calculating when and where to
+		//		leverage hash tables at O(1), or balanced trees, generally running in
+		//		logarithmic time.
+		//	Provide generalized access to specific data items in realtime.
+
+		// Initial Approach:
+		//	Naively design simple access to list of 255 elements (simple table)
+		//	Satisfy high level user requirments with stubs.
+		//	Aproxamate solution, test and refine plan.
+
+
 		
 
 		stringstream ss; ss << request.sock.dotted() << fence << request.request << fence << request.headers << fence  << cache;

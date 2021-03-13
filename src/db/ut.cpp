@@ -55,8 +55,6 @@ volatile bool KILL(false);
 
 #include <uuid.h>
 
-
-
 struct RequestManager : Request, KrunchData::DataBase
 {
     RequestManager(const icstring& _request, const icstringvector& _headers, Socket& _sock ) :
@@ -96,7 +94,6 @@ void* service(void* lk)
     stringstream ssexcept;
     try
     {
-
         while (!KILL)
         {
 		{const int T((rand()%1000)+10000); usleep(T); }
@@ -137,10 +134,7 @@ int main(const int argc, const char** argv)
     try
     {
         Log("Initializing webkruncher");
-
-
         vector<pid_t> children;
-
         while ( children.size() < 16 )
         {
             //Log( "Spawn" );
@@ -174,7 +168,6 @@ int main(const int argc, const char** argv)
             }
         } 
 
-
         while ( !KILL )
         {
             sleep(2);
@@ -185,7 +178,6 @@ int main(const int argc, const char** argv)
             //Log( "Parent killing child" );
             kill(*pit, SIGKILL);
         }
-        
     }
     catch (const char* e) {ssexcept<<e;}
     catch (string& e) {ssexcept<<e;}
