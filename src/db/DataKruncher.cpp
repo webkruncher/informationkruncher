@@ -167,9 +167,11 @@ namespace DataKruncher
 
 
 			// Plan Refinement, Iteration 10 Goal:
-			//	Provide efficient and simple solution to
-			//	safe and secure access to minimal, systems
-			//	level solution, leveraging the standard libraries 
+			//	Provide efficient and simple access to hierachical groups
+			//	of heterogeneous objects, using safe and secure access to data.
+			//	Demonstrate minimal, solution, leveraging the standard libraries 
+			//	without compromising the ability to implement the fully atomic and 
+			//	durable methods that are required to meet the end goal.
 	
 			// Iteration 20 Goal:
 			//	Refine all components, generalizing and parameterizing
