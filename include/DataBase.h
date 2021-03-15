@@ -29,6 +29,12 @@
 #define INFO_DATA
 #include <hyperbase.h>
 
+
+// Plan
+//	First, implement simple hypertext xml interface to underlying database.
+//	Thsn, offer user code the option to static link against db, providing
+//	identical functionality.
+
 namespace KrunchData
 {
 	struct DataBase : virtual HyperBase
