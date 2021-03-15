@@ -152,7 +152,14 @@ namespace DataKruncher
 		//		Make this function as short as possible while leveraging the full
 		//		breath of the services offered.
 		//	Store hierarchy of ip octets in self balancing structures.
-		//	Map incoming requests to specific entry
+		//	Map incoming requests to specific user entries, initially using simple keys, then
+		//	generalize to provide user defined keys, and provide consistent results
+		//	set management capabilities without forcing user code to depend on this library.
+		//	Keep all result set methods as standard as possible, leveraging red / black trees
+		//	and un-ordered sets and maps.  Initially, implement the optimal choice for general
+		//	use, then generalize, providing user code with control to specialize and / or re-
+		//	define the data structures.
+		//	
 		//	Control usage and access through common subsystem (streams/brokers)
 		//	Keep high level access at O(1)*4 O(1)( times each of four octets in ip addr )
 		//	Ensure each level operates efficiently, carefully calculating when and where to
