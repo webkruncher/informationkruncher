@@ -6,6 +6,7 @@ add_executable(
 	kruncherdb 
 	Data.cpp
 	DataKruncher.cpp
+	DataTools.cpp
 )
 
 target_include_directories( 

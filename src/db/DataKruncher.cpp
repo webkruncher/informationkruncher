@@ -40,6 +40,7 @@ typedef char chartype;
 typedef stringstream stringstreamtype;
 #include <exexml>
 #include <DataKruncher.h>
+#include <DataTools.h>
 #include <sys/ioctl.h>
 #include <infotools.h>
 using namespace InfoTools;
@@ -56,7 +57,6 @@ int testmain( int argc, char** argv )
 	stringstream sserr;
 	try
 	{
-
 		mkdir( "data", 0777  );
 		chdir( "data" );
 
@@ -196,6 +196,23 @@ namespace DataKruncher
 
 		stringstream ss; ss << request.sock.dotted() << fence << "ERROR|Payload::bool|No Revision" << fence << request.request << fence << request.headers << fence  << cache;
 		Log( NoBreaks( ss.str() ) );
+		return true;
+	}
+
+	bool Payload::Revision_0(ItemCache&)
+	{
+		stringstream ss; ss << "Revision_0" << fence << request.sock.dotted() << fence << request.request << fence << request.headers << fence ; 
+		Log( NoBreaks( ss.str() ) );
+
+		// Get a stack of for octets
+		Inet4 i4( request.sock.dotted() );
+
+		while ( ! i4.empty() )
+		{
+			const int octet( i4.top() );
+			i4.pop();
+		}
+		
 		return true;
 	}
 } // DataKruncher

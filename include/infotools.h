@@ -56,9 +56,14 @@ namespace InfoTools
                         while ( true )
                         {
                                 const size_t where( what.find( _how ) );
-                                if ( where  == string::npos ) return;
+                                if ( where  == string::npos )
+				{
+					
+					if ( what.size() ) push_back( what );
+					return;
+				} 
                                 push_back( what.substr(0, where ) );
-                                what.erase( 0, where+ 1 );
+                                what.erase( 0, where + _how.size() );
                         }
                 }
  
