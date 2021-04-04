@@ -226,10 +226,10 @@ namespace DataKruncher
 		while ( ! DbGuard ) 
 		{
 			times++; usleep( SleeperHold ); 
-			if ( ! ( times % 1000 ) )
+			if ( ! ( times % 100 ) )
 				{stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db guard and still waiting"; Log( NoBreaks( ss.str() ) ); }
 		}
-		if ( times > 3 ) {stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db guard"; Log( NoBreaks( ss.str() ) ); }
+		if ( times > 10 ) {stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db guard"; Log( NoBreaks( ss.str() ) ); }
 
 		ShLocker& Locker( DbGuard );
 
@@ -237,10 +237,10 @@ namespace DataKruncher
 		while ( (  Locker.pid ) || ( Locker.thread ) ) 
 		{	
 			times++; usleep( SleeperHold ); 
-			if ( ! ( times % 1000 ) )
+			if ( ! ( times % 100 ) )
 				{stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db lock and still waiting"; Log( NoBreaks( ss.str() ) ); }
 		}
-		if ( times > 3 ) {stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db lock"; Log( NoBreaks( ss.str() ) ); }
+		if ( times > 10 ) {stringstream ss; ss << "KRUNCHDB" << fence << "Waited " << (times*SleeperHold) << " us to get a db lock"; Log( NoBreaks( ss.str() ) ); }
 		
 		Locker.pid=getpid();
 		Locker.thread=pthread_self();
