@@ -59,6 +59,7 @@ using namespace InformationSocket;
 using namespace DataSet;
 #include <DataKruncher.h>
 #include <db_cxx.h>
+#include <shmemtools.h>
 
 struct Response_DB : Response
 {

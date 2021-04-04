@@ -19,6 +19,8 @@ function Killer
 if [ "${target}" == "all" ] || [ "${target}" == "infokruncher" ]; then
 	echo -ne "\033[33m\033[44mStopping infokruncher\033[0m\n"
 	Killer infokruncher
+	Killer kruncherdb
+	Killer krunchdbunittester
 fi
 
 

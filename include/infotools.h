@@ -407,6 +407,6 @@ namespace InfoTools
 
 
 
-} // JTools
+} // InfoTools
 
 #endif // KRUNCHERTOOLS

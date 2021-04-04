@@ -48,6 +48,7 @@ using namespace InfoTools;
 #include <db_cxx.h>
 #include <Database.h>
 #include <DbCursor.h>
+#include <shmemtools.h>
 
 using namespace BdbSpace;
 
@@ -199,10 +200,16 @@ namespace DataKruncher
 		return true;
 	}
 
+	struct ShLocker
+	{
+		pid_t pid;
+		pthread_t thread;
+	};
+
 	bool Payload::Revision_0(ItemCache&)
 	{
-		stringstream ss; ss << "Revision_0" << fence << request.sock.dotted() << fence << request.request << fence << request.headers << fence ; 
-		Log( NoBreaks( ss.str() ) );
+		const int SleeperHold( 1000 );
+		{ stringstream ss; ss << "Revision_0" << fence << request.sock.dotted() << fence << request.request << fence << request.headers << fence ; Log( NoBreaks( ss.str() ) ); }
 
 		// Get a stack of for octets
 		Inet4 i4( request.sock.dotted() );
@@ -212,7 +219,41 @@ namespace DataKruncher
 			const int octet( i4.top() );
 			i4.pop();
 		}
+
+		InfoTools::ShMem<ShLocker> DbGuard( "/shlocker" );
+
+		int times( 0 );
+		while ( ! DbGuard ) 
+		{
+			times++; usleep( SleeperHold ); 
+			if ( ! ( times % 1000 ) )
+				{stringstream ss; ss << "Waited " << (times*SleeperHold) << " us to get a db guard and still waiting"; Log( NoBreaks( ss.str() ) ); }
+		}
+		{stringstream ss; ss << "Waited " << (times*SleeperHold) << " us to get a db guard"; Log( NoBreaks( ss.str() ) ); }
+
+		ShLocker& Locker( DbGuard );
+
+		times=0;
+		while ( (  Locker.pid ) || ( Locker.thread ) ) 
+		{	
+			times++; usleep( SleeperHold ); 
+			if ( ! ( times % 1000 ) )
+				{stringstream ss; ss << "Waited " << (times*SleeperHold) << " us to get a db lock and still waiting"; Log( NoBreaks( ss.str() ) ); }
+		}
+		{stringstream ss; ss << "Waited " << (times*SleeperHold) << " us to get a db lock"; Log( NoBreaks( ss.str() ) ); }
 		
+		Locker.pid=getpid();
+		Locker.thread=pthread_self();
+
+		{ stringstream ss; ss << "Working on db" ; Log( NoBreaks( ss.str() ) ); }
+
+		usleep( 2000 );
+
+		Locker.pid=0;
+		Locker.thread=0;
+		
+
+
 		return true;
 	}
 } // DataKruncher
