@@ -25,3 +25,8 @@ if [ "${target}" == "dbut" ]; then
 	echo -ne "\033[35mStarting krunchdbunittester\033[0m\n"
 	./src.build/db/krunchdbunittester& 
 fi
+
+if [ "${target}" == "dbtests" ]; then
+	echo -ne "\033[35mStarting dbtests\033[0m\n"
+	./src.build/db/dbtests& 
+fi

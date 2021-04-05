@@ -34,3 +34,8 @@ if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
 	Killer krunchdbunittester
 fi
 
+if [ "${target}" == "all" ] || [ "${target}" == "dbtests" ]; then
+	echo -ne "\033[33m\033[44mStopping dbtests\033[0m\n"
+	Killer dbtests
+fi
+

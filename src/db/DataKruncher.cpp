@@ -53,73 +53,6 @@ using namespace InfoTools;
 using namespace BdbSpace;
 
 
-int testmain( int argc, char** argv )
-{
-	stringstream sserr;
-	try
-	{
-		mkdir( "data", 0777  );
-		chdir( "data" );
-
-		const u_int32_t envFlags =
-			DB_CREATE     |  // Create the environment if it does not exist
-			DB_RECOVER    |  // Run normal recovery.
-			DB_INIT_LOCK  |  // Initialize the locking subsystem
-			DB_INIT_LOG   |  // Initialize the logging subsystem
-			DB_INIT_TXN   |  // Initialize the transactional subsystem. This
-			// also turns on logging.
-			DB_INIT_MPOOL |  // Initialize the memory pool (in-memory cache)
-			DB_THREAD;       // Cause the environment to be free-threaded
-		DataBaseEnvironment environment(  envFlags );
-		if ( ! environment ) throw string("Can't create environment");
-
-		const u_int32_t openFlags = DB_CREATE              | // Allow database creation
-			    DB_READ_UNCOMMITTED    | // Allow uncommitted reads
-			    DB_AUTO_COMMIT         | // Allow autocommit
-			    DB_THREAD; // Cause the database to be free-threaded 
-
-		{
-			DataBase database( "db", environment, openFlags, DB_BTREE, DB_DUPSORT );
-			if ( ! database ) throw string( "Error loading db" ); 
-
-			{ pair< string,string > kv( "pumpkin", "pie" ); database+=kv; }
-			{ pair< string,string > kv( "apple", "sauce" ); database+=kv; }
-			{ pair< string,string > kv( "peach", "cobbler" ); database+=kv; }
-			cerr << database << endl;
-
-			vector<string> TestKeys;
-			TestKeys.push_back( "pumpkin" );
-			TestKeys.push_back( "pear" );
-			TestKeys.push_back( "apple" );
-			TestKeys.push_back( "peach" );
-
-			DbEnv& env( environment );
-			DbTxn *txn;
-			env.txn_begin(NULL, &txn, 0);
-			for ( vector<string>::const_iterator it=TestKeys.begin();it!=TestKeys.end();it++)
-			{
-				DbCursor cursor( database );
-				const string key( *it );
-				const int found( cursor( txn, key ) );
-				if ( ! found ) cout << "Can't find " << key << endl;
-				else cout << key << ":" << cursor << endl;
-			}
-			txn->commit(0);
-
-		}
-	}
-	catch (DbDeadlockException  &dbe) { sserr << "Exception: " << dbe.what() << endl; }
-	catch (DbException &dbe) { sserr << "Exception: " << dbe.what() << endl; }
-	catch ( string& e ) { sserr << "Exception: " << e << endl; }
-	catch ( exception& e ) { sserr << "Std Exception: " << e.what() << endl; }
-	catch ( ... ) { sserr << "Unknown Exception: " << endl; }
-
-	if ( ! sserr.str().empty() ) { cerr << sserr.str() ; return EXIT_FAILURE; }
-
-	return (EXIT_SUCCESS);
-}
-
-
 namespace DataKruncher
 {
 	ostream& Item::operator<<(ostream& o) { return XmlNode::operator<<(o); }
@@ -249,10 +182,7 @@ namespace DataKruncher
 
 		usleep( 200 );
 
-		Locker.pid=0;
-		Locker.thread=0;
-		
-
+		Locker.pid=0; Locker.thread=nullptr;
 
 		return true;
 	}
