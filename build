@@ -23,3 +23,10 @@ if [ "${target}" == "all" ] || [ "${target}" == "dbut" ]; then
 	cmake  --build src.build/ --target krunchdbunittester
 fi
 
+if [ "${target}" == "all" ] || [ "${target}" == "dbtests" ]; then
+	echo -ne "\033[32mBuilding dbtests\033[0m\n"
+	#cmake  -S src/ -B src.build/  --target dbtests
+	cmake  -S src/ -B src.build/  
+	cmake  --build src.build/ --target dbtests
+fi
+
